@@ -4,7 +4,7 @@ rules 		= 	rules:(rule:rule _ ";" _ {return rule;})+ {return rules;}
 
 rule 		=	symbol:symbol _ "=" _ ruleTail:ruleTail {return {rule: symbol.text, tail: ruleTail};}
 
-symbol 		= 	chars:[A-Z]+[A-Z0-9]* {return {type: "symbol", text: chars.join("")};}
+symbol 		= 	chars:[A-Z0-9]+ {return {type: "symbol", text: chars.join("")};}
 
 string 		= 	chars:[A-Za-zäöüÄÖÜßñÑáàÁÀéèÉÈóòÓÒúùÙÚ]+ {return {type: "text", text: chars.join("")};}
 

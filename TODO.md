@@ -1,15 +1,15 @@
 # TODO
 
+better user interface
 
-l-system
-
-grafik
+comments für grammar
 
 examples for:
-- markov
 - grammar
-- l-system
 
+grammar export for tracery.io
+
+grafik?
 
 # DONE
 
@@ -30,3 +30,9 @@ selection
 markov parameter?
 
 grammar
+
+l-system
+
+- l-system
+
+- markov
