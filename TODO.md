@@ -36,3 +36,5 @@ l-system
 - l-system
 
 - markov
+
+localStorage

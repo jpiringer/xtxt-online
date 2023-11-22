@@ -120,7 +120,13 @@ class App extends React.Component {
             console.error("An error occured while initializing : ", e)
         })
 
-        this.state = {mode: "methods", text: "", undoText: "", sourceText:"", prefix: 3}
+        var text = localStorage.getItem("xtxt-text");
+
+        if (text === undefined || text === null) {
+            text = "";
+        }
+        this.state = {mode: "methods", text: text, undoText: "", sourceText:"", prefix: 3}
+
         this.speak = this.speak.bind(this)
         this.handleChange = this.handleChange.bind(this);
         this.handleSourceChange = this.handleSourceChange.bind(this);
@@ -146,12 +152,18 @@ class App extends React.Component {
         this.clear = this.clear.bind(this)
     }
 
+    storeText(text) {
+        localStorage.setItem("xtxt-text", text);
+    }
+
     handleChange(event) {
         this.setState({text: event.target.value});
+        this.storeText(event.target.value);
     }
 
     handleSourceChange(event) {
         this.setState({sourceText: event.target.value});
+        this.storeSource(event.target.value);
     }
 
     speak() {
@@ -174,14 +186,17 @@ class App extends React.Component {
         let cursorEnd = textVal.selectionEnd;
 
         this.setState({undoText: this.state.text});
+        var newText = "";
         if (cursorStart === cursorEnd) { // process whole text
-            this.setState({text: func(this.state.text)});
+            newText = func(this.state.text);
         }
         else { // process only a part
             let str = func(this.state.text.substring(cursorStart,cursorEnd));
 
-            this.setState({text: this.state.text.substring(0, cursorStart)+str+this.state.text.substring(cursorEnd)});
+            newText = this.state.text.substring(0, cursorStart)+str+this.state.text.substring(cursorEnd);
         }
+        this.setState({text: newText});
+        this.storeText(newText);
     }
 
     shuffle() {
@@ -422,6 +437,7 @@ class App extends React.Component {
 
     undo() {
         let t = this.state.text
+        this.storeText(this.state.undoText);
         this.setState({text: this.state.undoText});
         this.setState({undoText: t});
     }
@@ -430,12 +446,25 @@ class App extends React.Component {
         this.changeText(() => {return "";});
     }
 
+    storeSource(sourceText) {
+        localStorage.setItem("xtxt-modestorage-"+this.state.mode, sourceText)
+    }
+
     setMode(m) {
-        this.setState({mode: m});
+        this.storeSource(this.state.sourceText);
+
+        var stored = localStorage.getItem("xtxt-modestorage-"+m)
+
+        if (stored === undefined || stored === null) {
+            stored = "";
+        }
+        
+        this.setState({mode: m, sourceText: stored});
     }
 
     setExample(ex) {
         this.setState({sourceText: ex});
+        this.storeSource(ex);
     }
 
     render() {
