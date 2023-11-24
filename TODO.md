@@ -2,12 +2,8 @@
 
 better user interface
 
-comments für grammar
-
-examples for:
-- grammar
-
-grammar export for tracery.io
+grammar
+- newline \n
 
 grafik?
 
@@ -38,3 +34,12 @@ l-system
 - markov
 
 localStorage
+
+examples for:
+- grammar
+
+comments für grammar
+
+- + einbauen inkl. tutorial
+
+- export for tracery.io

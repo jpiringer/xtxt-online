@@ -44,7 +44,16 @@ const examples = {
         {title: "rhythm 4", content: "# rhythm 4 - start with a\na = aaif;\ni = iof;\no = oaouf;\nu = ufuue;\ne = effei;\n"},
     ],
     grammar: [
-        {title: "tempora", content: ""}
+        {title: "tutorial 1", content: "# tutorial 1\nSTART = begin; # a START symbol is always needed\n# don't forget the semicolon ; at the end of each line\n"},
+        {title: "tutorial 2", content: "# tutorial 2\nSTART = SECOND; # a START symbol is always needed\nSECOND = all words written only in capital letters (and numbers) are substitued by their definition;\n"},
+        {title: "tutorial 3", content: "# tutorial 3\nSTART = EITHER | OR; # symbols separated by | are chosen randomly, try it a couple of times\nEITHER = this;\nOR = that;\n"},
+        {title: "tutorial 4", content: "# tutorial 4\nSTART = EITHER OR; # symbols separated by a space are joined\nEITHER = this;\nOR = that;\n"},
+        {title: "tutorial 5", content: "# tutorial 5\nSTART = FIRST+SECOND; # symbols separated by + are joined without a space\nFIRST = ver;\nSECOND = bindung;"},
+        {title: "tutorial 6", content: "# tutorial 6\nSTART = A A A A A A;\nA = but | though| and | too| B;\nB = i | you | he | she | START; # you can use symbols in symbol definitions\n"},
+        {title: "tutorial 7", content: "# tutorial 7\nSTART = infinite START; # but don't do this!!!\n"},
+        {title: "tempora", content: "START = SATZ.;\n\nSATZ = TEMPPRAES SATZPRAES | TEMPPAST SATZPAST | TEMPFUT SATZFUT;\n\nSATZPRAES = VERBPRAESSING SATZCONTSING | VERBPRAESPLUR SATZCONTPLUR;\nSATZPAST = VERBPASTSING SATZCONTSING | VERBPASTPLUR SATZCONTPLUR;\nSATZFUT = VERBFUTSING1 SATZCONTSING VERBFUTSING2 | VERBFUTPLUR1 SATZCONTPLUR VERBFUTPLUR2;\n\nVERBPRAESSING = ist;\nVERBPRAESPLUR = sind;\n\nVERBPASTSING = war;\nVERBPASTPLUR = waren;\n\nVERBFUTSING1 = wird;\nVERBFUTSING2 = gewesen sein;\nVERBFUTPLUR1 = werden;\nVERBFUTPLUR2 = gewesen sein;\n\nSATZCONTSING = alles besser | nichts wie zuvor | alles vergeblich | alles einerlei | alles schlechter | uns alles einerlei;\nSATZCONTPLUR = wir glücklich | wir unerfahren | wir unvorsichtig | wir übervorsichtig | wir genau | wir entschlossen zu allem;\n\nTEMPPRAES = heute | momentan | jetzt | in diesem moment;\nTEMPPAST = vorgestern | gestern | vor einem jahr | vor einer woche | gerade eben | voriges monat;\nTEMPFUT = morgen | übermorgen | bald | gleich | in einer woche | in einem jahr | in der zukunft | in einem monat;\n"},
+        {title: "wittgenstein", content: "START = PARAGRAPH PARAGRAPH PARAGRAPH PARAGRAPHS PARAGRAPHS;\n\nPARAGRAPHS = PARAGRAPH PARAGRAPHS | PARAGRAPH;\nPARAGRAPH = START1 START1 SENTENCES\\n\\n;\nSENTENCES = START1 SENTENCES | START1;\n\nSTART1 = START1A. | START1A. | START1A. | START1A. | PREFIX START1A. | PREFIXQ START1A? | FRAGE;\nSTART1A = SATZ1 | SATZ2 | SATZ3 | SATZ4;\n\nPREFIX    = ich kann mich darin nicht irren: | ich könnte sagen: | wenn ich sagte: | das heisst: | die antwort kann auch sein: | es ist seltsam: | man sagt nicht: | und dennoch: | wir sagen: | ich könnte auch so sagen: | man könnte auch sagen: | es scheint: | das wichtigste ist hier dies:;\nPREFIXQ    = soll ich sagen: | heißt das nun: | ist es falsch, zu sagen:;\n\nSATZ1 = SPTRANS OBJEKT;\nSATZ2 = SPINTRANS;\nSATZ1O2 = SATZ1 | SATZ2;\nSATZ3 = SATZ1O2, CONJ CONDSATZ;\nSATZ4 = wenn CONDSATZ, dann CONDSATZ2;\n\n\nCONDSATZ = CONDSATZTRANS | CONDSATZINTRANS;\nCONDSATZTRANS = SUBJEKTSING OBJEKTSING PREDTRANSSING | SUBJEKTPLUR OBJEKTPLUR PREDTRANSPLUR;\nCONDSATZINTRANS    = SUBJEKTSING PREDINTRANSSING | SUBJEKTPLUR PREDINTRANSPLUR;\n\nCONDSATZ2 = CONDSATZTRANS2 | CONDSATZINTRANS2;\nCONDSATZTRANS2 = PREDTRANSSING SUBJEKTSING OBJEKTSING | PREDTRANSPLUR SUBJEKTPLUR OBJEKTPLUR;\nCONDSATZINTRANS2 = PREDINTRANSSING SUBJEKTSING | PREDINTRANSPLUR SUBJEKTPLUR;\n\nFRAGE = FRAGEPREFIX FRAGE1A | FRAGE1A | FRAGE1A;\nFRAGEPREFIX = man möchte fragen: | frage:;\nFRAGE1A = FRAGEWORT PREDINTRANSSING SUBJEKTSING? | FRAGEWORT PREDINTRANSPLUR SUBJEKTPLUR?;\nFRAGEWORT = was | wie | wo;\n\nSPTRANS = SUBJEKTSING PREDTRANSSING | SUBJEKTPLUR PREDTRANSPLUR;\nSPINTRANS = SUBJEKTSING PREDINTRANSSING | SUBJEKTPLUR PREDINTRANSPLUR;\n\nOBJEKT = OBJEKTSING | OBJEKTPLUR;\n\nARTIKELSINGW = die;\nARTIKELSINGM = der;\nARTIKELSINGN = das;\n\nSUBJEKTSING1W = wahrheit | vorstellung | antwort | frage | negation | sprachverwendung | absicht | erwartung | philosophie | frage;\nSUBJEKTSING1M = satz | verstand | sinn | mensch;\nSUBJEKTSING1N = wort | erkennen | sprachspiel | wissen | experiment;\n\nGENITIVSING1M = satzes | verstandes | sinns | menschens;\nGENITIVSING1N = wortes | erkennens | sprachspiels | wissens | kindes;\n\nGENITIVSING    = der SUBJEKTSING1W | des GENITIVSING1M | des GENITIVSING1N;\n\nADJSINGDET = unzweifelhafte | unbeabsichtigte | zweifelhafte | überprüfte | unfehlbare | zusammenhanglose;\n\nSUBJEKTSING1A = ARTIKELSINGN SUBJEKTSING1N | ARTIKELSINGM SUBJEKTSING1M | ARTIKELSINGW SUBJEKTSING1W;\nSUBJEKTSING1ADJ    = ARTIKELSINGN ADJSINGDET SUBJEKTSING1N | ARTIKELSINGM ADJSINGDET SUBJEKTSING1M | ARTIKELSINGW ADJSINGDET SUBJEKTSING1W;\nSUBJEKTSING = SUBJEKTSING1A | SUBJEKTSING1ADJ | SUBJEKTSING1A GENITIVSING | SUBJEKTSING1ADJ GENITIVSING;\nPREDTRANSSING = sieht | untersucht | teilt | liest;\nPREDINTRANSSING    = spricht | lernt | irrt;\nOBJEKTSING = den satz | mich | den sinn | den zweifel | das spiel | das gedächtnis;\n\nSUBJEKTPLUR1 = gedanken | farben | sätze | antworten | fragen | worte | dinge | fragen;\nSUBJEKTPLUR    = SUBJEKTPLUR1 | ADJPLUR SUBJEKTPLUR1;\nPREDTRANSPLUR = sprechen | lehren | lesen;\nPREDINTRANSPLUR    = sprechen | spielen | beginnen | lernen;\nOBJEKTPLUR = die sätze | die zweifel | die wörter;\n\nADJPLUR = eindeutige | einzigartige | verschiedene | unzweifelhafte | unmittelbare;\n\nCONJ = während | wo | wenn | weshalb | worauf;\n"},
+        {title: "rhythm", content: "START = S. S. S. S.;\nS = tri XI | ti XF | dha XH;\nXI = ikt dha tri ikt dha ge na XD | ikt XJ | ikt XG;\nXF = dha XJ | XG;\nXH = ti dha tri ikt XB | tri ikt dha XC;\nXD = dha ti dha ge dhee na ge na;\nXJ = tri ikt XA;\nXG = dha ti XA;\nXB = dha tri ikt XD;\nXC = ti XB | ti dha ti XD | tri ikt dha XE;\nXA = dha XB;\nXE = dha XD | ge XD;\n"},
     ]
 }
 
@@ -147,6 +156,7 @@ class App extends React.Component {
         this.permutate = this.permutate.bind(this)
         this.applyMarkov = this.applyMarkov.bind(this)
         this.applyGrammar = this.applyGrammar.bind(this)
+        this.convertGrammar = this.convertGrammar.bind(this)
         this.applyLSystem = this.applyLSystem.bind(this)
         this.undo = this.undo.bind(this)
         this.clear = this.clear.bind(this)
@@ -359,7 +369,7 @@ class App extends React.Component {
             catch (e) {
                 return "ERROR: "+e.name + ': ' + e.message;
             }
-            //console.log(rules);
+            console.log(rules);
 
             let findRule = (ruleName) => {
                 for (var r of rules) {
@@ -379,29 +389,108 @@ class App extends React.Component {
 
                 const randomElement = ruleTail[Math.floor(Math.random() * ruleTail.length)];
                 var str = "";
+                var concatStr = " ";
                 for (var verb of randomElement) {
                     if (verb.type === "symbol") {
                         if (str.length > 0) {
-                            str += " ";
+                            str += concatStr;
                         }
                         str += expandRule(verb.text);
+                        concatStr = " ";
                     }
                     else if (verb.type === "text") {
                         if (str.length > 0) {
-                            str += " ";
+                            str += concatStr;
                         }
                         str += verb.text;
+                        concatStr = " ";
                     }
                     else if (verb.type === "punctuation") {
                         str += verb.text;
+                        concatStr = " ";
+                    }
+                    else if (verb.type === "concat") {
+                        concatStr = "";
                     }
                 }
                 return str;
             }
 
-            return expandRule("START");
+            var result = "";
+            try {
+                result = expandRule("START");
+            }
+            catch (e) {
+                result = "ERROR: "+e.name + ': ' + e.message;
+            }
+            return result;
         });
     }
+
+    convertGrammar() {
+        this.changeText((txt) => {
+            var rules;
+            var output = "";
+
+            try {
+                rules = parser.parse(this.state.sourceText)
+            }
+            catch (e) {
+                return "ERROR: "+e.name + ': ' + e.message;
+            }
+
+            let out = (txt) => {
+                output += txt;
+            }
+
+            let removeComma = (comma) => {
+                if (output.substring(output.length-comma.length, output.length) === comma) {
+                    output = output.substring(0, output.length-comma.length);
+                }
+            }
+
+            let outTail = (tail) => {
+                console.log(tail);
+
+                for (let tailAlternative of tail) {
+                    out("\"");
+
+                    for (var verb of tailAlternative) {
+                        if (verb.type === "symbol") {
+                            out("#");
+                            out(verb.text);
+                            out("# ");
+                        }
+                        else {
+                            out(verb.text);
+                            out(" ");
+                        }
+                    }
+                    removeComma(" ");
+                    out("\",");
+                }
+                removeComma(",");
+            }
+
+            out("// this is a grammar for the javascript generative grammar system tracery: https://www.tracery.io\nconst grammar = \n{\n");
+            for (var r of rules) {
+                var ruleName = r.rule;
+                if (ruleName === "START") {
+                    ruleName = "origin";
+                }
+                if (r.tail !== undefined) {
+                    out("\""+ruleName+"\":[");
+                    outTail(r.tail);
+                    out("],\n");
+                }
+            }
+            removeComma(",\n");
+            out("\n}");
+
+            return output;
+        });
+    }
+
 
     applyLSystem() {
         this.changeText((txt) => {
@@ -463,8 +552,8 @@ class App extends React.Component {
     }
 
     setExample(ex) {
-        this.setState({sourceText: ex});
         this.storeSource(ex);
+        this.setState({sourceText: ex});
     }
 
     render() {
@@ -562,7 +651,8 @@ class App extends React.Component {
              ref="sourceText" placeholder="enter grammar rules here..." />
 
                     </Form>
-                    <Button variant="outline-danger" onClick={this.applyGrammar}>generate</Button>{' '}<br />
+                    <Button variant="outline-danger" onClick={this.applyGrammar}>generate</Button>{' '}
+                    <Button variant="outline-success" onClick={this.convertGrammar}>convert</Button>{' '}<br />
                     </div>
                   :
                   <>
