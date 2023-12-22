@@ -3,12 +3,16 @@ import './App.scss'
 import React, { Component, ChangeEvent } from 'react'
 
 import Row from 'react-bootstrap/Row'
+import Col from 'react-bootstrap/Col'
+import Offcanvas from 'react-bootstrap/Offcanvas'
 
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
 import ButtonGroup from 'react-bootstrap/ButtonGroup'
 import ToggleButton from 'react-bootstrap/ToggleButton'
 import Dropdown from 'react-bootstrap/Dropdown'
+
+import { Info } from "./Info"
 
 import Speech from 'speak-tts'
 
@@ -70,6 +74,8 @@ interface xTXTState {
   undoText: string
   sourceText: string
   prefix: number
+  showInfo: boolean
+  showSettings: boolean
 }
  
 interface xTXTProps {
@@ -109,10 +115,14 @@ class App extends Component<xTXTProps, xTXTState> {
             text: text, 
             undoText: "", 
             sourceText:"", 
-            prefix: 3
-        }
+            prefix: 3,
+            showInfo: false,
+            showSettings: false
+        }          
 
         this.speak = this.speak.bind(this)
+        this.stopSpeech = this.stopSpeech.bind(this)
+
         this.handleChange = this.handleChange.bind(this);
         this.handleSourceChange = this.handleSourceChange.bind(this);
 
@@ -120,6 +130,7 @@ class App extends Component<xTXTProps, xTXTState> {
         this.applyGrammar = this.applyGrammar.bind(this)
         this.convertGrammar = this.convertGrammar.bind(this)
         this.applyLSystem = this.applyLSystem.bind(this)
+
         this.undo = this.undo.bind(this)
         this.clear = this.clear.bind(this)
     }
@@ -148,7 +159,7 @@ class App extends Component<xTXTProps, xTXTState> {
         });
     }
 
-    stop() {
+    stopSpeech() {
         window.speechSynthesis.cancel();
     }
 
@@ -384,11 +395,28 @@ class App extends Component<xTXTProps, xTXTState> {
         this.setState({sourceText: ex});
     }
 
+    settings() {
+        return (
+            <Offcanvas show={this.state.showSettings} onHide={() => {this.setState({showSettings: false})}}>
+                <Offcanvas.Header closeButton closeVariant="white">
+                    <Offcanvas.Title>Settings</Offcanvas.Title>
+                </Offcanvas.Header>
+                <Offcanvas.Body>
+
+                </Offcanvas.Body>
+            </Offcanvas>
+        );
+    }
+
     render() {
       return (
         <div className="App">
           <header className="App-header">
-            <h1>xTXT online</h1>
+            <Col>xTXT online</Col>
+            <Col>
+                <Button variant="outline-success" onClick={() => {this.setState({showInfo: true})}} ><i className="bi bi-info-circle"></i></Button>{' '}
+                <Button variant="outline-danger" onClick={() => {this.setState({showSettings: true})}}><i className="bi bi-gear"></i></Button>
+            </Col>
           </header>
           <div className="App-buttons">
                 <ButtonGroup>
@@ -498,11 +526,13 @@ class App extends Component<xTXTProps, xTXTState> {
                 <Button variant="outline-success" onClick={this.undo}>undo</Button>{' '}
                 <Button variant="outline-success" onClick={this.clear}>clear</Button>{' '}<br />
                 <Button variant="outline-success" onClick={this.speak}>speak</Button>{' '}
-                <Button variant="outline-danger" onClick={this.stop}>stop</Button>{' '}
+                <Button variant="outline-danger" onClick={this.stopSpeech}>stop</Button>{' '}
             </div>
             <div>
                 <p>this is a project by <a href="https://joerg.piringer.net/">jörg piringer</a></p>
             </div>
+            <Info show={this.state.showInfo} onHide={() => {this.setState({showInfo: false})}} />
+            { this.settings() }
         </div>
       );
     }

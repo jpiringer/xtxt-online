@@ -1,7 +1,5 @@
 # TODO
 
-info box
-
 settings
 
 - language (for speech)
@@ -16,7 +14,7 @@ project manager?
 
 grafik?
 
-# DONE
+## DONE
 
 condense
 
@@ -56,3 +54,5 @@ comments für grammar
 refactor to typescript
 
 move more functions into superstring
+
+info box

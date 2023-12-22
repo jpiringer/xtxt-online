@@ -1,6 +1,15 @@
+@import '~bootstrap/scss/bootstrap';
+@import "bootstrap-icons/font/bootstrap-icons.scss";
+
 html {
-    background-color: black;
+  background-color: black;
+  color: white;
 }
+
+label {
+  color: white;
+}
+
 
 p {
     color: white;
@@ -9,11 +18,7 @@ p {
 .App {
   text-align: center;
   background-color: black;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+  color: white;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -29,7 +34,7 @@ p {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+  font-size: calc(10px + 1vmin);
   color: white;
 }
 
@@ -56,6 +61,26 @@ p {
     margin: 1em 1em 1em 1em;
 }
 
+.offcanvas-body {
+  background-color: #303030;
+  color: white;
+}
+
+.offcanvas-header {
+  background-color: #303030;
+  color: white;
+}
+
+.blackmodal {
+  background-color: #303030;
+  color: white;
+}
+
+.heading {
+  clear: both;
+  background-color: darkgray;
+}
+
 .editor {
     background-color: grey;
 }
@@ -65,18 +90,9 @@ p {
 }
 
 .form-control:not(active){
-      color:white;
-   }
+  color:white;
+}
 
-   .form-control:focus{
-      color:black;
-   }
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.form-control:focus{
+  color:black;
 }
