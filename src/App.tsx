@@ -1,4 +1,4 @@
-import './App.css'
+import './App.scss'
 
 import React, { Component, ChangeEvent } from 'react'
 
@@ -17,7 +17,7 @@ import parser from "./grammar.js"
 
 import Markov from 'js-markov'
 
-type mode = "methods" | "markov" | "l-system" | "grammar"
+import superstring from "./superstring"
 
 const modes = [
     { name: 'methods', value: 'methods' },
@@ -26,7 +26,12 @@ const modes = [
     { name: 'grammar', value: 'grammar' },
 ]
 
-const examples: { [id: string] : any} = {
+interface IExample {
+    title: string
+    content: string
+}
+
+const examples: { [id: string] : IExample[]} = {
     "methods": [
     ],
     "markov": [
@@ -57,59 +62,6 @@ const examples: { [id: string] : any} = {
         {title: "wittgenstein", content: "START = PARAGRAPH PARAGRAPH PARAGRAPH PARAGRAPHS PARAGRAPHS;\n\nPARAGRAPHS = PARAGRAPH PARAGRAPHS | PARAGRAPH;\nPARAGRAPH = START1 START1 SENTENCES\\n\\n;\nSENTENCES = START1 SENTENCES | START1;\n\nSTART1 = START1A. | START1A. | START1A. | START1A. | PREFIX START1A. | PREFIXQ START1A? | FRAGE;\nSTART1A = SATZ1 | SATZ2 | SATZ3 | SATZ4;\n\nPREFIX    = ich kann mich darin nicht irren: | ich könnte sagen: | wenn ich sagte: | das heisst: | die antwort kann auch sein: | es ist seltsam: | man sagt nicht: | und dennoch: | wir sagen: | ich könnte auch so sagen: | man könnte auch sagen: | es scheint: | das wichtigste ist hier dies:;\nPREFIXQ    = soll ich sagen: | heißt das nun: | ist es falsch, zu sagen:;\n\nSATZ1 = SPTRANS OBJEKT;\nSATZ2 = SPINTRANS;\nSATZ1O2 = SATZ1 | SATZ2;\nSATZ3 = SATZ1O2, CONJ CONDSATZ;\nSATZ4 = wenn CONDSATZ, dann CONDSATZ2;\n\n\nCONDSATZ = CONDSATZTRANS | CONDSATZINTRANS;\nCONDSATZTRANS = SUBJEKTSING OBJEKTSING PREDTRANSSING | SUBJEKTPLUR OBJEKTPLUR PREDTRANSPLUR;\nCONDSATZINTRANS    = SUBJEKTSING PREDINTRANSSING | SUBJEKTPLUR PREDINTRANSPLUR;\n\nCONDSATZ2 = CONDSATZTRANS2 | CONDSATZINTRANS2;\nCONDSATZTRANS2 = PREDTRANSSING SUBJEKTSING OBJEKTSING | PREDTRANSPLUR SUBJEKTPLUR OBJEKTPLUR;\nCONDSATZINTRANS2 = PREDINTRANSSING SUBJEKTSING | PREDINTRANSPLUR SUBJEKTPLUR;\n\nFRAGE = FRAGEPREFIX FRAGE1A | FRAGE1A | FRAGE1A;\nFRAGEPREFIX = man möchte fragen: | frage:;\nFRAGE1A = FRAGEWORT PREDINTRANSSING SUBJEKTSING? | FRAGEWORT PREDINTRANSPLUR SUBJEKTPLUR?;\nFRAGEWORT = was | wie | wo;\n\nSPTRANS = SUBJEKTSING PREDTRANSSING | SUBJEKTPLUR PREDTRANSPLUR;\nSPINTRANS = SUBJEKTSING PREDINTRANSSING | SUBJEKTPLUR PREDINTRANSPLUR;\n\nOBJEKT = OBJEKTSING | OBJEKTPLUR;\n\nARTIKELSINGW = die;\nARTIKELSINGM = der;\nARTIKELSINGN = das;\n\nSUBJEKTSING1W = wahrheit | vorstellung | antwort | frage | negation | sprachverwendung | absicht | erwartung | philosophie | frage;\nSUBJEKTSING1M = satz | verstand | sinn | mensch;\nSUBJEKTSING1N = wort | erkennen | sprachspiel | wissen | experiment;\n\nGENITIVSING1M = satzes | verstandes | sinns | menschens;\nGENITIVSING1N = wortes | erkennens | sprachspiels | wissens | kindes;\n\nGENITIVSING    = der SUBJEKTSING1W | des GENITIVSING1M | des GENITIVSING1N;\n\nADJSINGDET = unzweifelhafte | unbeabsichtigte | zweifelhafte | überprüfte | unfehlbare | zusammenhanglose;\n\nSUBJEKTSING1A = ARTIKELSINGN SUBJEKTSING1N | ARTIKELSINGM SUBJEKTSING1M | ARTIKELSINGW SUBJEKTSING1W;\nSUBJEKTSING1ADJ    = ARTIKELSINGN ADJSINGDET SUBJEKTSING1N | ARTIKELSINGM ADJSINGDET SUBJEKTSING1M | ARTIKELSINGW ADJSINGDET SUBJEKTSING1W;\nSUBJEKTSING = SUBJEKTSING1A | SUBJEKTSING1ADJ | SUBJEKTSING1A GENITIVSING | SUBJEKTSING1ADJ GENITIVSING;\nPREDTRANSSING = sieht | untersucht | teilt | liest;\nPREDINTRANSSING    = spricht | lernt | irrt;\nOBJEKTSING = den satz | mich | den sinn | den zweifel | das spiel | das gedächtnis;\n\nSUBJEKTPLUR1 = gedanken | farben | sätze | antworten | fragen | worte | dinge | fragen;\nSUBJEKTPLUR    = SUBJEKTPLUR1 | ADJPLUR SUBJEKTPLUR1;\nPREDTRANSPLUR = sprechen | lehren | lesen;\nPREDINTRANSPLUR    = sprechen | spielen | beginnen | lernen;\nOBJEKTPLUR = die sätze | die zweifel | die wörter;\n\nADJPLUR = eindeutige | einzigartige | verschiedene | unzweifelhafte | unmittelbare;\n\nCONJ = während | wo | wenn | weshalb | worauf;\n"},
         {title: "rhythm", content: "START = S. S. S. S.;\nS = tri XI | ti XF | dha XH;\nXI = ikt dha tri ikt dha ge na XD | ikt XJ | ikt XG;\nXF = dha XJ | XG;\nXH = ti dha tri ikt XB | tri ikt dha XC;\nXD = dha ti dha ge dhee na ge na;\nXJ = tri ikt XA;\nXG = dha ti XA;\nXB = dha tri ikt XD;\nXC = ti XB | ti dha ti XD | tri ikt dha XE;\nXA = dha XB;\nXE = dha XD | ge XD;\n"},
     ]
-}
-
-function shuffleArray(array: any[]) {
-    for (var i = array.length - 1; i > 0; i--) {
-        var rand = Math.floor(Math.random() * (i + 1));
-        [array[i], array[rand]] = [array[rand], array[i]]
-    }
-}
-
-let findPermutations = (str: string) => {
-  if (!str || typeof str !== "string"){
-    return ["Please enter a string"]
-  }
-
-  if (!!str.length && str.length < 2 ){
-    return [str]
-  }
-
-  var permutationsArray: string[] = []
-
-  for (let i = 0; i < str.length; i++){
-    let char = str[i]
-
-    if (str.indexOf(char) !== i) {
-        continue
-    }
-
-    let remainder = str.slice(0, i) + str.slice(i + 1, str.length)
-
-    for (let permutation of findPermutations(remainder)){
-      permutationsArray.push(char + permutation) }
-  }
-  return permutationsArray
-}
-
-function filterString(str: string, filter: string) {
-  const json_string = JSON.stringify(str)
-
-  let filterd_string = ''
-
-  for (let i = 0; i < json_string.length; i++) {
-    let char = json_string[i]
-    let index = filter.indexOf(char)
-    if (index > -1) {
-      filterd_string += filter[index]
-    }
-  }
-
-  return filterd_string
-}
-
-function getRandomInt(max: number) {
-  return Math.floor(Math.random() * max);
 }
 
 interface xTXTState {
@@ -164,20 +116,6 @@ class App extends Component<xTXTProps, xTXTState> {
         this.handleChange = this.handleChange.bind(this);
         this.handleSourceChange = this.handleSourceChange.bind(this);
 
-        this.rip = this.rip.bind(this)
-        this.shuffle = this.shuffle.bind(this)
-        this.sort = this.sort.bind(this)
-        this.duplicate = this.duplicate.bind(this)
-        this.reverse = this.reverse.bind(this)
-
-        this.noise = this.noise.bind(this)
-        this.part = this.part.bind(this)
-        this.split = this.split.bind(this)
-        this.condense = this.condense.bind(this)
-        this.stretch = this.stretch.bind(this)
-        this.vowelsOnly = this.vowelsOnly.bind(this)
-        this.consOnly = this.consOnly.bind(this)
-        this.permutate = this.permutate.bind(this)
         this.applyMarkov = this.applyMarkov.bind(this)
         this.applyGrammar = this.applyGrammar.bind(this)
         this.convertGrammar = this.convertGrammar.bind(this)
@@ -233,146 +171,10 @@ class App extends Component<xTXTProps, xTXTState> {
         this.storeText(newText);
     }
 
-    shuffle() {
-        this.changeText((txt) => {
-            let arr = txt.split("");
-            shuffleArray(arr);
-            return arr.join("");
-        });
-    }
-
-    sort() {
-        this.changeText((txt) => txt.split("").sort().join(""));
-    }
-
-    reverse() {
-        this.changeText((txt) => txt.split("").reverse().join(""));
-    }
-
-    duplicate() {
-        this.changeText((txt) => txt+txt);
-    }
-
-    rip() {
-        this.changeText((txt) => {
-            var str = "";
-            let sz = txt.length;
-
-            for (var cnt = 0; cnt < sz;) {
-                let c = txt[cnt];
-
-                if (c !== '\n' && c !== '\r') {
-                    switch(getRandomInt(7)) {
-                        case 1:
-                            str += c;
-                        // eslint-disable-next-line no-fallthrough
-                        case 2:
-                            var c2 = txt[cnt%sz];
-                            if (c2 !== '\n' && c2 !== '\n') {
-                                str += c2;
-                            }
-                        // eslint-disable-next-line no-fallthrough
-                        default:
-                            str += c;
-                            cnt++;
-                            break;
-                    }
-                }
-                else {
-                    str += c;
-                    cnt++;
-                }
-            }
-            return str;
-        });
-    }
-
-    noise() {
-        const noiseChars = ",.-;:_#+*!$%&/()=?^°<>~";
-
-        this.changeText((txt) => {
-            var str = "";
-            var counter = 0;
-            var segmentLen = getRandomInt(8);
-
-            for (var i = 0; i < txt.length; i++) {
-                str += txt[i];
-                if (counter >= segmentLen) {
-                    segmentLen = getRandomInt(10);
-                    str += noiseChars[getRandomInt(noiseChars.length)];
-                    counter = 0;
-                }
-                counter++;
-            }
-            return str;
-        });
-    }
-
-    part() {
-        this.changeText((txt) => {
-            var str = "";
-            var counter = 0;
-            var segmentLen = getRandomInt(8);
-
-            for (var i = 0; i < txt.length; i++) {
-                str += txt[i];
-                if (counter >= segmentLen) {
-                    segmentLen = getRandomInt(10);
-                    str += " ";
-                    counter = 0;
-                }
-                counter++;
-            }
-            return str;
-        });
-    }
-
-    split() {
-        this.changeText((txt) => txt.split("").join(" "));
-    }
-
-    condense() {
-        this.changeText((txt) =>
-            txt.replace(/\s+/g, " ")
-        );
-    }
-
-    stretch() {
-        const stretchable = "aefhilmnorsuyzäöüAEFHILMNORSUYZÄÖÜ";
-
-        this.changeText((txt) => {
-            var str = "";
-
-            for (var i = 0; i < txt.length; i++) {
-                str += txt[i];
-                if (stretchable.indexOf(txt[i]) >= 0) {
-                    str += txt[i];
-                }
-            }
-            return str;
-        });
-    }
-
-    vowelsOnly() {
-        this.changeText((txt) => filterString(txt, "aeiouäöüyáàóòíìAEIOUÄÖÜÁÀÓÒY "));
-    }
-
-    consOnly() {
-        this.changeText((txt) => filterString(txt, "bcdfghjklmnpqrstvwxzñßBCDFGHJKLMNPQRSTVWXZÑ "));
-    }
-
-    permutate() {
-        this.changeText((txt) => {
-            if (txt.length <= 0) {
-                return "";
-            }
-            if (txt.length > 8) {
-                return "input text is too long. should not be longer than 8 characters!";
-            }
-            else {
-                return findPermutations(txt).join(" ");
-            }
-        });
+    changer(func: (txt: string) => string) {
+        return () => {
+            this.changeText(func)
+        }
     }
 
     applyMarkov() {
@@ -608,25 +410,25 @@ class App extends Component<xTXTProps, xTXTState> {
                 <br />
                 {this.state.mode === "methods" ?
                     <>
-                    <Button variant="outline-primary" onClick={this.rip}>rip</Button>{' '}
-                    <Button variant="outline-primary" onClick={this.shuffle}>shuffle</Button>{' '}
-                    <Button variant="outline-primary" onClick={this.sort}>sort</Button>{' '}
-                    <Button variant="outline-primary" onClick={this.reverse}>reverse</Button>{' '}
+                    <Button variant="outline-primary" onClick={this.changer(superstring.rip)}>rip</Button>{' '}
+                    <Button variant="outline-primary" onClick={this.changer(superstring.shuffle)}>shuffle</Button>{' '}
+                    <Button variant="outline-primary" onClick={this.changer(superstring.sort)}>sort</Button>{' '}
+                    <Button variant="outline-primary" onClick={this.changer(superstring.reverse)}>reverse</Button>{' '}
 
-                    <Button variant="outline-primary" onClick={this.noise}>noise</Button>{' '}
-                    <Button variant="outline-primary" onClick={this.part}>part</Button>{' '}
-                    <Button variant="outline-primary" onClick={this.split}>split</Button>{' '}
-                    <Button variant="outline-primary" onClick={this.condense}>condense</Button>{' '}
+                    <Button variant="outline-primary" onClick={this.changer(superstring.noise)}>noise</Button>{' '}
+                    <Button variant="outline-primary" onClick={this.changer(superstring.part)}>part</Button>{' '}
+                    <Button variant="outline-primary" onClick={this.changer(superstring.split)}>split</Button>{' '}
+                    <Button variant="outline-primary" onClick={this.changer(superstring.condense)}>condense</Button>{' '}
 
-                    <Button variant="outline-primary" onClick={this.stretch}>stretch</Button>{' '}
-                    <Button variant="outline-primary" onClick={this.vowelsOnly}>vowels only</Button>{' '}
-                    <Button variant="outline-primary" onClick={this.consOnly}>cons only</Button>{' '}
-                    <Button variant="outline-primary" onClick={this.duplicate}>duplicate</Button>{' '}
-                    <Button variant="outline-primary" onClick={this.permutate}>permutate</Button>{' '}<br />
+                    <Button variant="outline-primary" onClick={this.changer(superstring.stretch)}>stretch</Button>{' '}
+                    <Button variant="outline-primary" onClick={this.changer(superstring.vowelsOnly)}>vowels only</Button>{' '}
+                    <Button variant="outline-primary" onClick={this.changer(superstring.consOnly)}>cons only</Button>{' '}
+                    <Button variant="outline-primary" onClick={this.changer(superstring.duplicate)}>duplicate</Button>{' '}
+                    <Button variant="outline-primary" onClick={this.changer(superstring.permutate)}>permutate</Button>{' '}<br />
                     </>
                     :
                     <></>
-    }      
+                }      
                 {this.state.mode !== "methods" ?
                 <Dropdown>
                     <Dropdown.Toggle variant="outline-success" id="dropdown-basic">
@@ -640,16 +442,16 @@ class App extends Component<xTXTProps, xTXTState> {
                     </Dropdown.Menu>
                 </Dropdown>
                 : <></>}
-              {this.state.mode === "markov" ?
+                {this.state.mode === "markov" ?
                   <div className="App-text">
                     <Form>
                         <Form.Control as="textarea" rows={12} value={this.state.sourceText} onChange={this.handleSourceChange} style={{backgroundColor: "#999999", color: "black"}}
-             ref={this.sourceRef} placeholder="enter markov source text here..." />
+                                        ref={this.sourceRef} placeholder="enter markov source text here..." />
 
-                    <Form.Group as={Row}>
-                        <Form.Label>prefix {this.state.prefix} </Form.Label>
-                        <Form.Range value={this.state.prefix} min={1} max={10} onChange={e => this.setState({prefix: parseInt(e.target.value, 10)})}/>
-                    </Form.Group>
+                        <Form.Group as={Row}>
+                            <Form.Label>prefix {this.state.prefix} </Form.Label>
+                            <Form.Range value={this.state.prefix} min={1} max={10} onChange={e => this.setState({prefix: parseInt(e.target.value, 10)})}/>
+                        </Form.Group>
                     </Form>
                     <Button variant="outline-danger" onClick={this.applyMarkov}>apply</Button>{' '}<br />
                     </div>
@@ -657,11 +459,11 @@ class App extends Component<xTXTProps, xTXTState> {
                   <>
                   </>
               }
-              {this.state.mode === "lsystem" ?
+                {this.state.mode === "lsystem" ?
                   <div className="App-text">
                     <Form>
                         <Form.Control as="textarea" rows={12} value={this.state.sourceText} onChange={this.handleSourceChange} style={{backgroundColor: "#999999", color: "black"}}
-             ref={this.sourceRef} placeholder="enter l-system rules here..." />
+                                        ref={this.sourceRef} placeholder="enter l-system rules here..." />
 
                     </Form>
                     <Button variant="outline-danger" onClick={this.applyLSystem}>generate</Button>{' '}<br />
@@ -670,11 +472,11 @@ class App extends Component<xTXTProps, xTXTState> {
                   <>
                   </>
               }
-              {this.state.mode === "grammar" ?
+                {this.state.mode === "grammar" ?
                   <div className="App-text">
                     <Form>
                         <Form.Control as="textarea" rows={12} value={this.state.sourceText} onChange={this.handleSourceChange} style={{backgroundColor: "#999999", color: "black"}}
-             ref={this.sourceRef} placeholder="enter grammar rules here..." />
+                                        ref={this.sourceRef} placeholder="enter grammar rules here..." />
 
                     </Form>
                     <Button variant="outline-danger" onClick={this.applyGrammar}>generate</Button>{' '}
@@ -689,7 +491,7 @@ class App extends Component<xTXTProps, xTXTState> {
             <div className="App-text">
                 <Form>
                     <Form.Control as="textarea" rows={12} value={this.state.text} onChange={this.handleChange} style={{backgroundColor: "#999999", color: "black"}}
-           ref={this.inputRef} autoFocus placeholder="input here..." />
+                                    ref={this.inputRef} autoFocus placeholder="input here..." />
                 </Form>
             </div>
             <div className="App-buttons">

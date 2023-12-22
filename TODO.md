@@ -1,15 +1,20 @@
 # TODO
 
-refactor to typescript
+info box
+
+settings
+
+- language (for speech)
 
 better user interface
 
 grammar
+
 - newline \n
 
+project manager?
+
 grafik?
-
-
 
 # DONE
 
@@ -47,3 +52,7 @@ comments für grammar
 - + einbauen inkl. tutorial
 
 - export for tracery.io
+
+refactor to typescript
+
+move more functions into superstring
