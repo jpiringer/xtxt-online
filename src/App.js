@@ -241,11 +241,13 @@ class App extends React.Component {
                     switch(getRandomInt(7)) {
                         case 1:
                             str += c;
+                        // eslint-disable-next-line no-fallthrough
                         case 2:
                             var c2 = txt[cnt%sz];
                             if (c2 !== '\n' && c2 !== '\n') {
                                 str += c2;
                             }
+                        // eslint-disable-next-line no-fallthrough
                         default:
                             str += c;
                             cnt++;

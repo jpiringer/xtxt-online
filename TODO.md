@@ -1,5 +1,7 @@
 # TODO
 
+refactor to typescript
+
 better user interface
 
 grammar
