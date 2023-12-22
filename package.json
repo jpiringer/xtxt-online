@@ -15,14 +15,20 @@
     "js-markov": "^3.0.3",
     "npm-run-all": "^4.1.5",
     "pegjs": "^0.10.0",
-    "react": "^17.0.2",
+    "react": "^18.2.0",
     "react-bootstrap": "^2.9.1",
-    "react-dom": "^17.0.2",
-    "react-scripts": "4.0.3",
+    "react-dom": "^18.2.0",
+    "react-scripts": "^5.0.1",
     "react-speech": "^1.0.2",
     "speak-tts": "^2.0.8",
     "speech-synth": "^1.0.1",
+    "typescript": "^5.3.3",
     "web-vitals": "^1.1.2"
+  },
+  "overrides": {
+    "react-scripts": {
+      "typescript": "^5"
+    }
   },
   "scripts": {
     "parser-gen": "pegjs -o src/grammar.js src/grammar.pegjs",

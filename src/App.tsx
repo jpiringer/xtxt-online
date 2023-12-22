@@ -1,33 +1,35 @@
-import './App.css';
+import './App.css'
 
-import React from "react";
+import React, { Component, ChangeEvent } from 'react'
 
-import {Row, Col, Container} from "react";
+import Row from 'react-bootstrap/Row'
 
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
-import ButtonGroup from 'react-bootstrap/ButtonGroup';
-import ToggleButton from 'react-bootstrap/ToggleButton';
-import Dropdown from 'react-bootstrap/Dropdown';
+import Button from 'react-bootstrap/Button'
+import Form from 'react-bootstrap/Form'
+import ButtonGroup from 'react-bootstrap/ButtonGroup'
+import ToggleButton from 'react-bootstrap/ToggleButton'
+import Dropdown from 'react-bootstrap/Dropdown'
 
-import Speech from 'speak-tts';
+import Speech from 'speak-tts'
 
-import lsystem from "./lsystem.js";
-import parser from "./grammar.js";
+import lsystem from "./lsystem.js"
+import parser from "./grammar.js"
 
-const Markov = require('js-markov');
+import Markov from 'js-markov'
+
+type mode = "methods" | "markov" | "l-system" | "grammar"
 
 const modes = [
     { name: 'methods', value: 'methods' },
     { name: 'markov', value: 'markov' },
     { name: 'l-system', value: 'lsystem' },
     { name: 'grammar', value: 'grammar' },
-  ];
+]
 
-const examples = {
-    methods: [
+const examples: { [id: string] : any} = {
+    "methods": [
     ],
-    markov: [
+    "markov": [
         {title: "wordsworth", content: "I wandered lonely as a cloud\nThat floats on high o'er vales and hills,\nWhen all at once I saw a crowd,\nA host, of golden daffodils;\nBeside the lake, beneath the trees,\nFluttering and dancing in the breeze.\n\nContinuous as the stars that shine\nAnd twinkle on the milky way,\nThey stretched in never-ending line\nAlong the margin of a bay:\nTen thousand saw I at a glance,\nTossing their heads in sprightly dance.\n\nThe waves beside them danced; but they\nOut-did the sparkling waves in glee:\nA poet could not but be gay,\nIn such a jocund company:\nI gazed—and gazed—but little thought\nWhat wealth the show to me had brought:\n\nFor oft, when on my couch I lie\nIn vacant or in pensive mood,\nThey flash upon that inward eye\nWhich is the bliss of solitude;\nAnd then my heart with pleasure fills,\nAnd dances with the daffodils."},
         {title: "words", content: "a\nabout\nabove\nacross\nact\nactive\nactivity\nadd\nafraid\nafter\nagain\nage\nago\nagree\nair\nall\nalone\nalong\nalready\nalways\nam\namount\nan\nand\nangry\nanother\nanswer\nany\nanyone\nanything\nanytime\nappear\napple\nare\narea\narm\narmy\naround\narrive\nart\nas\nask\nat\nattack\naunt\nautumn\naway\nbaby\nbase\nback\nbad\nbag\nball\nbank\nbasket\nbath\nbe\nbean\nbear\nbeautiful\nbeer\nbed\nbedroom\nbehave\nbefore\nbegin\nbehind\nbell\nbelow\nbesides\nbest\nbetter\nbetween\nbig\nbird\nbirth\nbirthday\nbit\nbite\nblack\nbleed\nblock\nblood\nblow\nblue\nboard\nboat\nbody\nboil\nbone\nbook\nborder\nborn\nborrow\nboth\nbottle\nbottom\nbowl\nbox\nboy\nbranch\nbrave\nbread\nbreak\nbreakfast\nbreathe\nbridge\nbright\nbring\nbrother\nbrown\nbrush\nbuild\nburn\nbusiness\nbus\nbusy\nbut\nbuy\nby\ncake\ncall\ncan\ncandle\ncap\ncar\ncard\ncare\ncareful\ncareless\ncarry\ncase\ncat\ncatch\ncentral\ncentury\ncertain\nchair\nchance\nchange\nchase\ncheap\ncheese\nchicken\nchild\nchildren\nchocolate\nchoice\nchoose\ncircle\ncity\nclass\nclever\nclean\nclear\nclimb\nclock\ncloth\nclothes\ncloud\ncloudy\nclose\ncoffee\ncoat\ncoin\ncold\ncollect\ncolour\ncomb\ncomfortable\ncommon\ncompare\ncome\ncomplete\ncomputer\ncondition\ncontinue\ncontrol\ncook\ncool\ncopper\ncorn\ncorner\ncorrect\ncost\ncontain\ncount\ncountry\ncourse\ncover\ncrash\ncross\ncry\ncup\ncupboard\ncut\ndance\ndangerous\ndark\ndaughter\nday\ndead\ndecide\ndecrease\ndeep\ndeer\ndepend\ndesk\ndestroy\ndevelop\ndie\ndifferent\ndifficult\ndinner\ndirection\ndirty\ndiscover\ndish\ndirection\ndo\ndog\ndoor\ndouble\ndown\ndraw\ndream\ndress\ndrink\ndrive\ndrop\ndry\nduck\ndust\nduty\neach\near\nearly\nearn\nearth\neast\neasy\neat\neducation\neffect\negg\neight\neither\nelectric\nelephant\nelse\nempty\nend\nenemy\nenjoy\nenough\nenter\nequal\nentrance\nescape\neven\nevening\nevent\never\nevery\neveryone\nexact\neverybody\nexamination\nexample\nexcept\nexcited\nexercise\nexpect\nexpensive\nexplain\nextremely\neye\nface\nfact\nfail\nfall\nfalse\nfamily\nfamous\nfar\nfarm\nfather\nfast\nfat\nfault\nfear\nfeed\nfeel\nfemale\nfever\nfew\nfight\nfill\nfilm\nfind\nfine\nfinger\nfinish\nfire\nfirst\nfit\nfive\nfix\nflag\nflat\nfloat\nfloor\nflour\nflower\nfly\nfold\nfood\nfool\nfoot\nfootball\nfor\nforce\nforeign\nforest\nforget\nforgive\nfork\nform\nfox\nfour\nfree\nfreedom\nfreeze\nfresh\nfriend\nfriendly\nfrom\nfront\nfruit\nfull\nfun\nfunny\nfurniture\nfurther\nfuture\ngame\ngarden\ngate\ngeneral\ngentleman\nget\ngift\ngive\nglad\nglass\ngo\ngoat\ngod\ngold\ngood\ngoodbye\ngrandfather\ngrandmother\ngrass\ngrave\ngreat\ngreen\ngrey\nground\ngroup\ngrow\ngun\nhair\nhalf\nhall\nhammer\nhand\nhappen\nhappy\nhard\nhat\nhate\nhave\nhe\nhead\nhealthy\nhear\nheavy\nhello\nhelp\nheart\nheaven\nheight\nhelp\nhen\nher\nhere\nhers\nhide\nhigh\nhill\nhim\nhis\nhit\nhobby\nhold\nhole\nholiday\nhome\nhope\nhorse\nhospital\nhot\nhotel\nhouse\nhow\nhundred\nhungry\nhour\nhurry\nhusband\nhurt\nI\nice\nidea\nif\nimportant\nin\nincrease\ninside\ninto\nintroduce\ninvent\niron\ninvite\nis\nisland\nit\nits\njelly\njob\njoin\njuice\njump\njust\nkeep\nkey\nkill\nkind\nking\nkitchen\nknee\nknife\nknock\nknow\nladder\nlady\nlamp\nland\nlarge\nlast\nlate\nlately\nlaugh\nlazy\nlead\nleaf\nlearn\nleave\nleg\nleft\nlend\nlength\nless\nlesson\nlet\nletter\nlibrary\nlie\nlife\nlight\nlike\nlion\nlip\nlist\nlisten\nlittle\nlive\nlock\nlonely\nlong\nlook\nlose\nlot\nlove\nlow\nlower\nluck\nmachine\nmain\nmake\nmale\nman\nmany\nmap\nmark\nmarket\nmarry\nmatter\nmay\nme\nmeal\nmean\nmeasure\nmeat\nmedicine\nmeet\nmember\nmention\nmethod\nmiddle\nmilk\nmillion\nmind\nminute\nmiss\nmistake\nmix\nmodel\nmodern\nmoment\nmoney\nmonkey\nmonth\nmoon\nmore\nmorning\nmost\nmother\nmountain\nmouth\nmove\nmuch\nmusic\nmust\nmy\nname\nnarrow\nnation\nnature\nnear\nnearly\nneck\nneed\nneedle\nneighbour\nneither\nnet\nnever\nnew\nnews\nnewspaper\nnext\nnice\nnight\nnine\nno\nnoble\nnoise\nnone\nnor\nnorth\nnose\nnot\nnothing\nnotice\nnow\nnumber\nobey\nobject\nocean\nof\noff\noffer\noffice\noften\noil\nold\non\none\nonly\nopen\nopposite\nor\norange\norder\nother\nour\nout\noutside\nover\nown\npage\npain\npaint\npair\npan\npaper\nparent\npark\npart\npartner\nparty\npass\npast\npath\npay\npeace\npen\npencil\npeople\npepper\nper\nperfect\nperiod\nperson\npetrol\nphotograph\npiano\npick\npicture\npiece\npig\npin\npink\nplace\nplane\nplant\nplastic\nplate\nplay\nplease\npleased\nplenty\npocket\npoint\npoison\npolice\npolite\npool\npoor\npopular\nposition\npossible\npotato\npour\npower\npresent\npress\npretty\nprevent\nprice\nprince\nprison\nprivate\nprize\nprobably\nproblem\nproduce\npromise\nproper\nprotect\nprovide\npublic\npull\npunish\npupil\npush\nput\nqueen\nquestion\nquick\nquiet\nquite\nradio\nrain\nrainy\nraise\nreach\nread\nready\nreal\nreally\nreceive\nrecord\nred\nremember\nremind\nremove\nrent\nrepair\nrepeat\nreply\nreport\nrest\nrestaurant\nresult\nreturn\nrice\nrich\nride\nright\nring\nrise\nroad\nrob\nrock\nroom\nround\nrubber\nrude\nrule\nruler\nrun\nrush\nsad\nsafe\nsail\nsalt\nsame\nsand\nsave\nsay\nschool\nscience\nscissors\nsearch\nseat\nsecond\nsee\nseem\nsell\nsend\nsentence\nserve\nseven\nseveral\nsex\nshade\nshadow\nshake\nshape\nshare\nsharp\nshe\nsheep\nsheet\nshelf\nshine\nship\nshirt\nshoe\nshoot\nshop\nshort\nshould\nshoulder\nshout\nshow\nsick\nside\nsignal\nsilence\nsilly\nsilver\nsimilar\nsimple\nsingle\nsince\nsing\nsink\nsister\nsit\nsix\nsize\nskill\nskin\nskirt\nsky\nsleep\nslip\nslow\nsmoke\nsmall\nsmell\nsmile\nsmoke\nsnow\nso\nsoap\nsock\nsoft\nsome\nsomeone\nsomething\nsometimes\nson\nsoon\nsorry\nsound\nsoup\nsouth\nspace\nspeak\nspecial\nspeed\nspell\nspend\nspoon\nsport\nspread\nspring\nsquare\nstamp\nstand\nstar\nstart\nstation\nstay\nsteal\nsteam\nstep\nstill\nstomach\nstone\nstop\nstore\nstorm\nstory\nstrange\nstreet\nstrong\nstructure\nstudent\nstudy\nstupid\nsubject\nsubstance\nsuccessful\nsuch\nsudden\nsugar\nsuitable\nsummer\nsun\nsunny\nsupport\nsure\nsurprise\nsweet\nswim\nsword\ntable\ntake\ntalk\ntall\ntaste\ntaxi\ntea\nteach\nteam\ntear\ntelephone\ntelevision\ntell\nten\ntennis\nterrible\ntest\nthan\nthat\nthe\ntheir\nthen\nthere\ntherefore\nthese\nthick\nthin\nthing\nthink\nthird\nthis\nthough\nthreat\nthree\ntidy\ntie\ntitle\nto\ntoday\ntoe\ntogether\ntomorrow\ntonight\ntoo\ntool\ntooth\ntop\ntotal\ntouch\ntown\ntrain\ntram\ntravel\ntree\ntrouble\ntrue\ntrust\ntwice\ntry\nturn\ntype\nuncle\nunder\nunderstand\nunit\nuntil\nup\nuse\nuseful\nusual\nusually\nvegetable\nvery\nvillage\nvoice\nvisit\nwait\nwake\nwalk\nwant\nwarm\nwash\nwaste\nwatch\nwater\nway\nwe\nweak\nwear\nweather\nwedding\nweek\nweight\nwelcome\nwell\nwest\nwet\nwhat\nwheel\nwhen\nwhere\nwhich\nwhile\nwhite\nwho\nwhy\nwide\nwife\nwild\nwill\nwin\nwind\nwindow\nwine\nwinter\nwire\nwise\nwish\nwith\nwithout\nwoman\nwonder\nword\nwork\nworld\nworry\nworry\nworst\nwrite\nwrong\nyear\nyes\nyesterday\nyet\nyou\nyoung\nyour\nzero\n"},
         {title: "genesis-en", content: "In the beginning, God created the heavens and the earth. The earth was without form and void, and darkness was over the face of the deep. And the Spirit of God was hovering over the face of the waters.\n\nAnd God said, “Let there be light,” and there was light. And God saw that the light was good. And God separated the light from the darkness. God called the light Day, and the darkness he called Night. And there was evening and there was morning, the first day.\n\nAnd God said, “Let there be an expanse in the midst of the waters, and let it separate the waters from the waters.” And God made the expanse and separated the waters that were under the expanse from the waters that were above the expanse. And it was so. And God called the expanse Heaven. And there was evening and there was morning, the second day.\n\nAnd God said, “Let the waters under the heavens be gathered together into one place, and let the dry land appear.” And it was so. God called the dry land Earth, and the waters that were gathered together he called Seas. And God saw that it was good.\n\nAnd God said, “Let the earth sprout vegetation, plants yielding seed, and fruit trees bearing fruit in which is their seed, each according to its kind, on the earth.” And it was so. The earth brought forth vegetation, plants yielding seed according to their own kinds, and trees bearing fruit in which is their seed, each according to its kind. And God saw that it was good. And there was evening and there was morning, the third day.\n\nAnd God said, “Let there be lights in the expanse of the heavens to separate the day from the night. And let them be for signs and for seasons, and for days and years, and let them be lights in the expanse of the heavens to give light upon the earth.” And it was so. And God made the two great lights—the greater light to rule the day and the lesser light to rule the night—and the stars. And God set them in the expanse of the heavens to give light on the earth, to rule over the day and over the night, and to separate the light from the darkness. And God saw that it was good. And there was evening and there was morning, the fourth day.\n\nAnd God said, “Let the waters swarm with swarms of living creatures, and let birds fly above the earth across the expanse of the heavens.” So God created the great sea creatures and every living creature that moves, with which the waters swarm, according to their kinds, and every winged bird according to its kind. And God saw that it was good. And God blessed them, saying, “Be fruitful and multiply and fill the waters in the seas, and let birds multiply on the earth.” And there was evening and there was morning, the fifth day.\n\nAnd God said, “Let the earth bring forth living creatures according to their kinds—livestock and creeping things and beasts of the earth according to their kinds.” And it was so. And God made the beasts of the earth according to their kinds and the livestock according to their kinds, and everything that creeps on the ground according to its kind. And God saw that it was good.\n\nThen God said, “Let us make man in our image, after our likeness. And let them have dominion over the fish of the sea and over the birds of the heavens and over the livestock and over all the earth and over every creeping thing that creeps on the earth.”\n\nSo God created man in his own image, in the image of God he created him; male and female he created them.\nAnd God blessed them. And God said to them, “Be fruitful and multiply and fill the earth and subdue it, and have dominion over the fish of the sea and over the birds of the heavens and over every living thing that moves on the earth.” And God said, “Behold, I have given you every plant yielding seed that is on the face of all the earth, and every tree with seed in its fruit. You shall have them for food. And to every beast of the earth and to every bird of the heavens and to everything that creeps on the earth, everything that has the breath of life, I have given every green plant for food.” And it was so. And God saw everything that he had made, and behold, it was very good. And there was evening and there was morning, the sixth day."},
@@ -35,7 +37,7 @@ const examples = {
         {title: "wörter", content: "abgekratzter\nabkoche\nabgefülltem\nabgaskanals\nadmiralsgattin\nabbildungsabschnitts\nabstimmfrequenzen\nabreist\nabstrahlend\nabzuhörende\nachtflächner\nabsprunggeschwindigkeiten\nabgenabelten\nabwasseraufbereitung\nabfertigungsleitern\nabkürzen\nabfindungsanspruches\nablageschränke\nablaufgerüsten\nabzäunend\nabmahnten\nabtrat\nabrechnungsroutinen\nabenteuerpfades\nabzusehende\nachtzehnter\nabenteuerurlauben\nabfallhalde\nabzupellen\nabgebuchte\nabzulaichen\nabschussvariante\nabbekommens\nabgekratzten\nadmiralstabschefs\nablötender\nabschnittszahl\nachtzehnstöckigem\nabgrund\nabputzenden\nabkürzungserläuterung\nabschlussfigur\nafghanen\nabklaubtest\nabsolutzahlen\nabrollgewichtes\nachtsilbe\nabschreibungsliste\nabsatztheorie\nabwehrreihen\nabtrennung\nackerkommissionen\nabstoppst\nabmontierendes\nackerbausysteme\nabsicherungsmitteln\nabfahrtsrennen\nachtsitzig\nabrunden\nabwurftests\nabstiegskonkurrenten\nadelsporträts\nabhöre\nabsatzkampf\naberwitziger\nabsturzstelle\nabstößen\nabschlusstrakten\nackerlosem\nabzahlungsdarlehen\nabgestaubten\nabflauend\nabfallwirtschaftsverbandes\nabsatztrennung\nabflussrohrs\nabzuklopfenden\nabenteuerurlauberin\nabpasst\nabkratzen\nabzeichnenden\naffenstunde\nabfertigungsposition\nabkürzungswörterbüchern\nabrüstungsangeboten\nabschreibungsrücklage\nabwicklungsbank\nadressabgleich\naberwitzigen\nafghane\nabgetretenen\nabmildre\naffenstalles\nabgekämpft\nableitungsterms\nabgefeuertem\naddierbefehle\nabwiegelnder\nabteilungsgefügen\nadditiven\nabgeschmirgelte\nabspülen\nabziehwerkzeugs\nabschiedsfete\nabwehrkämpfen\nabspieldrehzahl\nableseverfahren\nabtransportierbarer\nadoptiertest\nabgekoppelt\nabzugsfähigkeiten\nabflussmittels\nabstellkapazität\nabstrahlrichtung\nadministrationstool\nabschaltspannung\nabgrenzungsstrukturen\nabbruchfalls\nabseitsregeln\nabdominallinie\nableitungssystemen\nabnutzungsgefechte\nabarbeitendes\nabsicherungsformen\nabgasbeheizt\nadressermittlung\nabdampfflut\nabtasteinheiten\nabzuwirtschaftende\nabbruchmaske\nablassventil\nabdruckes\nabriebvorgang\nabflugplan\nadjunktor\nadressensuchdienstes\nabschalttermins\nablaufprozesse\nabgezockten\nabaxialer\nabzweigdose\nabstandsquadratgesetze\nabnutzungspigment\nabtastsignals\nabbaugeräuschen\nabgabenbelastungen\nabspülst\nachtarmigen\nabrissgeschwindigkeiten\nabfertigungsvorschrift\nabendländisch\nabendnetz\nabbildungsnotationen\nabzulegen\nadlerfanges\nabbaubeschleunigung\nabschrägt\nabfräst\nabwaschendem\nablaufvorgang\nachselstück\nabspielmethoden\nabstoppte\nabzuhören\nadressendienst\nablieferten\nabgestützter\nabfärbendem\nabwehrfähigkeit\nabgehängtes\nabwehrfahrzeugs\nadapterringen\nabzuleitendem\nabziehbarer\nacrylkronen\nabgeflauter\nabsahnpolitik\nabgeschlagenem\nabfüllbetrieben\naberration\nablenkbar\nabgeschattete\nabendgage\nabhörqualität\nabbaumaschine\nadministrationssystems\nackerbaubetrieb\nabgefressener\nabgeschlepptes\nabgezählten\nabgespannteres\nabschalttemperatur\nabgebaggert\nablaufverfolgungsprogrammen\nabwärtskompatiblem\nabrichtwerkzeuge\nabgemurkst\naffensteinen\nabreißkante\nablenkgeschwindigkeit\nachterpacks\nabzugskapitals\nablieferungsauflage\nabtreibungslager\nabwesenheitsprozessen\nabrechnungsverbindlichkeit\nabflussgewässern\nafghanisch\nabgrenzungsvereinbarung\nabzahlten\nabfallschublade\nabrissen\nabfertigungsleiter\nabschert\nabgehäutete\nabschreckungskonzepten\nachsträger\nabendhauch\nabseitstors\nachtsaitiges\nachtstelliges\nabsatzanteils\nabfangjagd\nableitungsbegriffs\nadäquatem\nabschirmleiter\nabbruchkrans\nabhängigkeitspotenzial\nachsstellung\nabspielprogramms\nabsicherungsmaßnahme\nabgeordnetenhauswahlen\nabknöpftest\nabzufindende\nabbauleitzentrale\nabsorptionsminimums\nactionelemente\nabmarschierens\nabstinenzgebote\nabgeordnetenliste\nabspanntextes\nabfallbeseitigungsgesetz\nabgebrachte\nabgewürgtes\nabnahmezeugnissen\nadditionsworten\nabonnierbar\nabgedrehtem\nabsetzraum\nachsellymphgefäße\nabwasserkonzepts\nachtsemestrige\nabwehrmechanismus\nabgesägten\nabzutreibendes\nabrichtanschlages\nabstimmungsbereich\nabkürzungsteile\nabstiegsreife\nachsdifferentialen\nachsenbau\nackermaß\nabsatzgliederungen\nabblendbarer\nabstellhebeln\nabwaschwassers\nabblockendem\nabtratest\nabgabenstrafverfahren\nachsenwinkel\nabschlusszugabe\nachsausrichtung\naberntend\nabschaltpunktes\nachterbahnzug\nabrollbergs\nabgabefreier\nabspiegelnde\nabdruckspur\nabonnementvertrages\nabstimmungshinweisen\nabschreibungsparameters\nachtens\nabschiedsbrief\nadlerhaupt\nadressensysteme\nabzudeckende\nabgequälten\nabgerupfte\nabsperrorganen\nabwurfdächern\nabnahmesysteme\nabfüllfilialen\nabriegelungen\nabrüstungskomitees\nabstraktionsprinzipien\nabschlusssatz\nabzuzappeln\nabzuschneidender\naderisolierung\nablösend\nabbaurate\nabzuwehren\nabtsstühle\nabfallprodukts\nabwickelndes\nabnormale\nadriger\nabschlussreferate\nabwärtstransporten\nabflussreinigern\nabwehrprojekten\nabgeguckt\nabzugssystems\nabspenstige\nabschlussnomenklaturen\nabstiegssorgen\nachtelfinalspiele\nabsorptionskühlschrank\nabsehens\nabgesangs\nachtundvierzig\nabbruchsiege\nabzahlungssysteme\nabbröckelnden\nacrylharzes\nabstrahierend\nabstammungsnachweises\nabzuklauben\nabgeglittenem\nabgeschmetterter\nabgenützter\nabschleppvorgang\nablaufleistungen\nabriebvorganges\nabteilbarer\nachterbereich\nachteten\nabgezirkelt\nabhängigkeitserfahrung\nabdrosselndem\nadlerflugs\nachtundzwanzigfacher\nabwanderungsbereitschaft\nabenteuersucht\nabdominalorgans\nabwirtschaften\nabsteppender\nadressenfreigaben\nabwandert\nablasshilfen\nabnormalere\nabwesenheitsprozesse\nachtbaren\nabenteuerformates\nabzusonderndes\nabdankende\nabnahm\nabwicklungssysteme\nabschlussquote\nabstandszahlungen\nabarbeitungsgeschwindigkeiten\naffären\naffenkultur\naffenstil\nadministrationsbereich\nabgeschlachteten\nabschließenden\nabwertungslandes\nablaufrechners\nabbindest\nadressendienste\nablasspraxis\nabrate\nabwehrgeschützen\nabenteuerreichem\nabschreibungsstichtag\nabstimmkreises\nabkürzungswegen\nabstimmungsverluste\naffektbrücken\nableitungsmaschinen\nabnutzungsanzeigers\nabänderungsbedürftiges\nabstrampelns\nablötetet\nachterschläge\nabgeheilter\nabbildungslösung\nabzäuntet\nabtakelnder\nabsetzapparat\nabschlachtenden\nabsolviert\nabfragegeräten\nabgewetzten\nablagepunkte\nachterbecke\nabkratzen\nabgangsballistik\nadventswassers\nachteckseiten\nabgabezeitpunkte\nadressleisten\nabzublockendes\nabschreckungsfunktion\nabgespritztem\nabbauregion\nabdeckdrucke\nabfallproblematik\nabbrandoberflächen\naffekterzeugung\nabschicktet\nabgekratztem\nabdichten\nabfülltechnologien\nabschmiertet\nabblendscheinwerfern\nabfahrtsweltmeistertitel\nabkoppelnder\nabgezäuntes\nabgenommen\nachsenwechsel\nabbaurevieren\nadelstraktate\nabdrosseltet\nabtastmechanismen\nabkürzungsorgien\naceton\nadressierend\nabschlussposition\nabsetzbecken\nabergläubischster\nablaufsteuerwerke\nabbruchfalls\näffe\nadoptionen\nadaptivem\nabtropfenden\nabreist\nadelst\nackern\nabbaugeräten\nabrissreifes\nabbuchungssystems\nadelsfraktionen\nadelstage\nadelsrechts\nabwegigeres\nabhobelnde\nabwasserkreislauf\nabkuppelten\nabschrauben\nadressspeichers\nabfaulender\nactionregisseurin\nabtropfen\nabstreichend\nabhinge\nabzugleichender\nabschlecke\nabfangbewaffnung\nabseitsstehen\nadressseite\nabbruchreaktion\nabzutastender\nabgeheiltes\nabwälzung\nadressblöcken\nabgeordnetenhauswahlkreisen\nabwurflinie\nabdampfte\nadlerschnäbeln\nadministrationsministern\nackerrechte\nadelsgeschichte\nabstiegsbedrohter\naddiervorrichtungen\nabwehrfähigkeit\nabzuspülen\nabschleifenden\nabarbeitende\nabschwellend\nabneigungen\nabsurderen\nabziehbare\nabspanntest\nabquältet\nabriebfestem\nabzuringende\nabschneidefunktion\nabstaubenden\nabstrusitäten\nabflog\nadressmarkierungen\nabgeschätztem\nabbrechers\nabgebüßtes\nabhörschnittstelle\nabschlussveranstaltungen\nabgeordnetenwahl\nabtastpositionen\nabfertigungsgruppen\nabklingkurven\nabtrennenden\nabzustecken\nabschneidens\nabfahrtstagen\nabziehplakat\nableitungsversuch\nabflussquerschnitten\nabbindeverhaltens\nabschlussventilventil\nabschaltgeschwindigkeit\nadventistischem\nabsorptionssystems\nabfangjäger\nabtippt\nabgebrachten\nacrylbeschichtung\nachtermann\nabgemindertem\nabstimmungswillen\nabwärtsfahrt\nachtzigster\nabgenäht\nabfülle\nabgasentgiftungen\nabliefern\nabgeplagter\nabzuwerten\nadaption\nadventivwurzeln\nabzweiggleis\nabflussgittern\nachtsamkeit\nabbaubereiche\nabstandsrohre\nabschwenktet\naffektwirkung\nabsatzprozesses\nabbrennen\nabzweigklemme\nabgestattetem\nablehnungsbescheiden\nabflaute\nabbrausend\nabdeckhüllen\nabklingcharakteristik\nabwasserreinigung\nabschiedsworts\n"},
         {title: "genesis-de", content: "Im Anfang war das Wort, und das Wort war bei Gott, und das Wort war Gott. Im Anfang war es bei Gott. Alles ist durch das Wort geworden und ohne das Wort wurde nichts, was geworden ist. In ihm war das Leben und das Leben war das Licht der Menschen. Und das Licht leuchtet in der Finsternis und die Finsternis hat es nicht erfasst. Es trat ein Mensch auf, der von Gott gesandt war; sein Name war Johannes. Er kam als Zeuge, um Zeugnis abzulegen für das Licht, damit alle durch ihn zum Glauben kommen. Er war nicht selbst das Licht, er sollte nur Zeugnis ablegen für das Licht. Das wahre Licht, das jeden Menschen erleuchtet, kam in die Welt. Er war in der Welt und die Welt ist durch ihn geworden, aber die Welt erkannte ihn nicht. Er kam in sein Eigentum, aber die Seinen nahmen ihn nicht auf. Allen aber, die ihn aufnahmen, gab er Macht, Kinder Gottes zu werden, allen, die an seinen Namen glauben, die nicht aus dem Blut, nicht aus dem Willen des Fleisches, nicht aus dem Willen des Mannes, sondern aus Gott geboren sind. Und das Wort ist Fleisch geworden und hat unter uns gewohnt und wir haben seine Herrlichkeit gesehen, die Herrlichkeit des einzigen Sohnes vom Vater, voll Gnade und Wahrheit. Johannes legte Zeugnis für ihn ab und rief: Dieser war es, über den ich gesagt habe: Er, der nach mir kommt, ist mir voraus, weil er vor mir war. Aus seiner Fülle haben wir alle empfangen, Gnade über Gnade. Denn das Gesetz wurde durch Mose gegeben, die Gnade und die Wahrheit kamen durch Jesus Christus. Niemand hat Gott je gesehen. Der Einzige, der Gott ist und am Herzen des Vaters ruht, er hat Kunde gebracht."},
     ],
-    lsystem: [
+    "lsystem": [
         {title: "b-language", content: "# b-language\na = aba;\ne = ebe;\ni = ibi;\no = obo;\nu = ubu;\ny = yby;\nä = äbä;\nö = öbö;\nü = übü;"},
         {title: "buchstabieralphabet", content: "# österreichisches buchstabieralphabet\na = anton ;\nb = berta ;\nc = cäsar ;\nd = dora ;\ne = emil ;\nf = friedrich ;\ng = gustav ;\nh = heinrich ;\ni = ida ;\nj = julius ;\nk = konrad ;\nl = ludwig ;\nm = martha ;\nn = nordpol ;\no = otto ;\np = paula ;\nq = quelle ;\nr = richard ;\ns = samuel ;\nt = theodor ;\nu = ulrich ;\nv = viktor ;\nw = wilhelm ;\nx = xaver ;\ny = ypsilon ;\nz = zeppelin ;\nä = ärger ;\nö = ökonom ;\nü = übermut ;\nß = scharfes s ;"},
         {title: "rhythm 1", content: "# rhythm 1 - start with s\ns = ska;\nt = atts;\nk = kakap;\np = kpki kik po po;\no = op rop po;"},
@@ -43,7 +45,7 @@ const examples = {
         {title: "rhythm 3", content: "# rhythm 3 - start with i\ni = ix;\nx = xixa;\na = aksi;\nk = kassik;\n"},
         {title: "rhythm 4", content: "# rhythm 4 - start with a\na = aaif;\ni = iof;\no = oaouf;\nu = ufuue;\ne = effei;\n"},
     ],
-    grammar: [
+    "grammar": [
         {title: "tutorial 1", content: "# tutorial 1\nSTART = begin; # a START symbol is always needed\n# don't forget the semicolon ; at the end of each line\n"},
         {title: "tutorial 2", content: "# tutorial 2\nSTART = SECOND; # a START symbol is always needed\nSECOND = all words written only in capital letters (and numbers) are substitued by their definition;\n"},
         {title: "tutorial 3", content: "# tutorial 3\nSTART = EITHER | OR; # symbols separated by | are chosen randomly, try it a couple of times\nEITHER = this;\nOR = that;\n"},
@@ -57,32 +59,32 @@ const examples = {
     ]
 }
 
-function shuffleArray(array) {
+function shuffleArray(array: any[]) {
     for (var i = array.length - 1; i > 0; i--) {
         var rand = Math.floor(Math.random() * (i + 1));
         [array[i], array[rand]] = [array[rand], array[i]]
     }
 }
 
-let findPermutations = (string) => {
-  if (!string || typeof string !== "string"){
-    return "Please enter a string"
+let findPermutations = (str: string) => {
+  if (!str || typeof str !== "string"){
+    return ["Please enter a string"]
   }
 
-  if (!!string.length && string.length < 2 ){
-    return string
+  if (!!str.length && str.length < 2 ){
+    return [str]
   }
 
-  let permutationsArray = []
+  var permutationsArray: string[] = []
 
-  for (let i = 0; i < string.length; i++){
-    let char = string[i]
+  for (let i = 0; i < str.length; i++){
+    let char = str[i]
 
-    if (string.indexOf(char) !== i) {
+    if (str.indexOf(char) !== i) {
         continue
     }
 
-    let remainder = string.slice(0, i) + string.slice(i + 1, string.length)
+    let remainder = str.slice(0, i) + str.slice(i + 1, str.length)
 
     for (let permutation of findPermutations(remainder)){
       permutationsArray.push(char + permutation) }
@@ -90,8 +92,8 @@ let findPermutations = (string) => {
   return permutationsArray
 }
 
-function filterString(string, filter) {
-  const json_string = JSON.stringify(string)
+function filterString(str: string, filter: string) {
+  const json_string = JSON.stringify(str)
 
   let filterd_string = ''
 
@@ -106,15 +108,31 @@ function filterString(string, filter) {
   return filterd_string
 }
 
-function getRandomInt(max) {
+function getRandomInt(max: number) {
   return Math.floor(Math.random() * max);
 }
 
-class App extends React.Component {
+interface xTXTState {
+  mode: string
+  text: string
+  undoText: string
+  sourceText: string
+  prefix: number
+}
+ 
+interface xTXTProps {
+}
 
+class App extends Component<xTXTProps, xTXTState> {
+    speech: any
+    private inputRef: React.RefObject<HTMLTextAreaElement>;
+    private sourceRef: React.RefObject<HTMLTextAreaElement>;
 
-    constructor(props) {
+    constructor(props: xTXTProps) {
         super(props)
+
+        this.inputRef = React.createRef();
+        this.sourceRef = React.createRef();
 
         this.speech = new Speech()
         this.speech.init({
@@ -122,10 +140,10 @@ class App extends React.Component {
             'lang': 'de-DE',
             'rate': 1,
             'pitch': 1
-        }).then((data) => {
+        }).then((data: any) => {
             // The "data" object contains the list of available voices and the voice synthesis params
             console.log("Speech is ready, voices are available", data)
-        }).catch(e => {
+        }).catch((e: Error) => {
             console.error("An error occured while initializing : ", e)
         })
 
@@ -134,7 +152,13 @@ class App extends React.Component {
         if (text === undefined || text === null) {
             text = "";
         }
-        this.state = {mode: "methods", text: text, undoText: "", sourceText:"", prefix: 3}
+        this.state = {
+            mode: "methods", 
+            text: text, 
+            undoText: "", 
+            sourceText:"", 
+            prefix: 3
+        }
 
         this.speak = this.speak.bind(this)
         this.handleChange = this.handleChange.bind(this);
@@ -162,16 +186,16 @@ class App extends React.Component {
         this.clear = this.clear.bind(this)
     }
 
-    storeText(text) {
+    storeText(text: string) {
         localStorage.setItem("xtxt-text", text);
     }
 
-    handleChange(event) {
+    handleChange(event: ChangeEvent<HTMLTextAreaElement>) {
         this.setState({text: event.target.value});
         this.storeText(event.target.value);
     }
 
-    handleSourceChange(event) {
+    handleSourceChange(event: ChangeEvent<HTMLTextAreaElement>) {
         this.setState({sourceText: event.target.value});
         this.storeSource(event.target.value);
     }
@@ -181,7 +205,7 @@ class App extends React.Component {
             text: this.state.text,
         }).then(() => {
             console.log("Success !")
-        }).catch(e => {
+        }).catch((e: Error) => {
             console.error("An error occurred :", e)
         });
     }
@@ -190,10 +214,10 @@ class App extends React.Component {
         window.speechSynthesis.cancel();
     }
 
-    changeText(func) {
-        let textVal = this.refs.inputText;
-        let cursorStart = textVal.selectionStart;
-        let cursorEnd = textVal.selectionEnd;
+    changeText(func: (txt: string) => string) {
+        let textVal = this.inputRef.current!
+        let cursorStart = textVal.selectionStart!;
+        let cursorEnd = textVal.selectionEnd!;
 
         this.setState({undoText: this.state.text});
         var newText = "";
@@ -363,17 +387,17 @@ class App extends React.Component {
 
     applyGrammar() {
         this.changeText((txt) => {
-            var rules;
+            var rules: any;
 
             try {
                 rules = parser.parse(this.state.sourceText)
             }
-            catch (e) {
+            catch (e: any) {
                 return "ERROR: "+e.name + ': ' + e.message;
             }
             console.log(rules);
 
-            let findRule = (ruleName) => {
+            let findRule = (ruleName: string) => {
                 for (var r of rules) {
                     if (r.rule === ruleName) {
                         return r.tail;
@@ -382,7 +406,7 @@ class App extends React.Component {
                 return undefined;
             }
 
-            let expandRule = (ruleName) => {
+            let expandRule = (ruleName: string) => {
                 let ruleTail = findRule(ruleName);
 
                 if (ruleTail === undefined) {
@@ -422,7 +446,7 @@ class App extends React.Component {
             try {
                 result = expandRule("START");
             }
-            catch (e) {
+            catch (e: any) {
                 result = "ERROR: "+e.name + ': ' + e.message;
             }
             return result;
@@ -431,27 +455,27 @@ class App extends React.Component {
 
     convertGrammar() {
         this.changeText((txt) => {
-            var rules;
+            var rules: any;
             var output = "";
 
             try {
                 rules = parser.parse(this.state.sourceText)
             }
-            catch (e) {
+            catch (e: any) {
                 return "ERROR: "+e.name + ': ' + e.message;
             }
 
-            let out = (txt) => {
+            let out = (txt: string) => {
                 output += txt;
             }
 
-            let removeComma = (comma) => {
+            let removeComma = (comma: string) => {
                 if (output.substring(output.length-comma.length, output.length) === comma) {
                     output = output.substring(0, output.length-comma.length);
                 }
             }
 
-            let outTail = (tail) => {
+            let outTail = (tail: any) => {
                 console.log(tail);
 
                 for (let tailAlternative of tail) {
@@ -496,16 +520,16 @@ class App extends React.Component {
 
     applyLSystem() {
         this.changeText((txt) => {
-            var rules;
+            var rules: any;
 
             try {
                 rules = lsystem.parse(this.state.sourceText)
             }
-            catch (e) {
+            catch (e: any) {
                 return "ERROR: "+e.name + ': ' + e.message;
             }
 
-            let findRule = (ruleName) => {
+            let findRule = (ruleName: string) => {
                 for (var r of rules) {
                     if (r.rule === ruleName) {
                         return r.tail;
@@ -537,11 +561,11 @@ class App extends React.Component {
         this.changeText(() => {return "";});
     }
 
-    storeSource(sourceText) {
+    storeSource(sourceText: string) {
         localStorage.setItem("xtxt-modestorage-"+this.state.mode, sourceText)
     }
 
-    setMode(m) {
+    setMode(m: string) {
         this.storeSource(this.state.sourceText);
 
         var stored = localStorage.getItem("xtxt-modestorage-"+m)
@@ -553,7 +577,7 @@ class App extends React.Component {
         this.setState({mode: m, sourceText: stored});
     }
 
-    setExample(ex) {
+    setExample(ex: string) {
         this.storeSource(ex);
         this.setState({sourceText: ex});
     }
@@ -610,7 +634,7 @@ class App extends React.Component {
                     </Dropdown.Toggle>
 
                     <Dropdown.Menu>
-                    {examples[this.state.mode].map((example, index) => (
+                    {examples[this.state.mode].map((example: any, index: number) => (
                         <Dropdown.Item onClick={()=>{this.setExample(example.content);}}>{example.title}</Dropdown.Item>
                     ))}
                     </Dropdown.Menu>
@@ -620,7 +644,7 @@ class App extends React.Component {
                   <div className="App-text">
                     <Form>
                         <Form.Control as="textarea" rows={12} value={this.state.sourceText} onChange={this.handleSourceChange} style={{backgroundColor: "#999999", color: "black"}}
-             ref="sourceText" placeholder="enter markov source text here..." />
+             ref={this.sourceRef} placeholder="enter markov source text here..." />
 
                     <Form.Group as={Row}>
                         <Form.Label>prefix {this.state.prefix} </Form.Label>
@@ -637,7 +661,7 @@ class App extends React.Component {
                   <div className="App-text">
                     <Form>
                         <Form.Control as="textarea" rows={12} value={this.state.sourceText} onChange={this.handleSourceChange} style={{backgroundColor: "#999999", color: "black"}}
-             ref="sourceText" placeholder="enter l-system rules here..." />
+             ref={this.sourceRef} placeholder="enter l-system rules here..." />
 
                     </Form>
                     <Button variant="outline-danger" onClick={this.applyLSystem}>generate</Button>{' '}<br />
@@ -650,7 +674,7 @@ class App extends React.Component {
                   <div className="App-text">
                     <Form>
                         <Form.Control as="textarea" rows={12} value={this.state.sourceText} onChange={this.handleSourceChange} style={{backgroundColor: "#999999", color: "black"}}
-             ref="sourceText" placeholder="enter grammar rules here..." />
+             ref={this.sourceRef} placeholder="enter grammar rules here..." />
 
                     </Form>
                     <Button variant="outline-danger" onClick={this.applyGrammar}>generate</Button>{' '}
@@ -665,7 +689,7 @@ class App extends React.Component {
             <div className="App-text">
                 <Form>
                     <Form.Control as="textarea" rows={12} value={this.state.text} onChange={this.handleChange} style={{backgroundColor: "#999999", color: "black"}}
-           ref="inputText" autoFocus placeholder="input here..." />
+           ref={this.inputRef} autoFocus placeholder="input here..." />
                 </Form>
             </div>
             <div className="App-buttons">
