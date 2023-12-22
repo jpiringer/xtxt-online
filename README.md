@@ -1,4 +1,13 @@
-# Getting Started with Create React App
+# xTXT-online
+
+this is the online version of my xTXT-app i published for MacOS and Windows.
+it can generate and manipulate text.
+it is a very basic app i use for teaching generative text creation workshops.
+
+the basic functionality is already implemented with React & Typescript.
+
+if you want to see it in action, go here:
+<https://joerg.piringer.net/xTXTonline/>
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
