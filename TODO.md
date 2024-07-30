@@ -1,5 +1,10 @@
 # TODO
 
+LLM.js einbauen:
+https://rahuldshetty.github.io/llm.js/#/
+oder web-llm
+https://www.npmjs.com/package/@mlc-ai/web-llm
+
 settings
 
 - language (for speech)

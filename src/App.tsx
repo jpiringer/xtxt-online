@@ -26,6 +26,7 @@ import superstring from "./superstring"
 const modes = [
     { name: 'methods', value: 'methods' },
     { name: 'markov', value: 'markov' },
+    { name: 'language model', value: 'llm' },
     { name: 'l-system', value: 'lsystem' },
     { name: 'grammar', value: 'grammar' },
 ]
@@ -36,6 +37,12 @@ interface IExample {
 }
 
 const examples: { [id: string] : IExample[]} = {
+    "llm": [
+        {title: "poem", content: "write a poem"},
+        {title: "poem 2", content: "write a funny poem"},
+        {title: "poem 3", content: "write a sad poem in spanish"},
+        {title: "poem 4", content: "write a crazy poem by using only numbers and uppercase letters"},
+    ],
     "methods": [
     ],
     "markov": [
@@ -186,6 +193,10 @@ class App extends Component<xTXTProps, xTXTState> {
         return () => {
             this.changeText(func)
         }
+    }
+
+    applyLLM() {
+
     }
 
     applyMarkov() {
@@ -470,6 +481,23 @@ class App extends Component<xTXTProps, xTXTState> {
                     </Dropdown.Menu>
                 </Dropdown>
                 : <></>}
+                {this.state.mode === "llm" ?
+                  <div className="App-text">
+                    <Form>
+                        <Form.Control as="textarea" rows={5} value={this.state.sourceText} onChange={this.handleSourceChange} style={{backgroundColor: "#999999", color: "black"}}
+                                        ref={this.sourceRef} placeholder="enter prompt..." />
+
+                        {/*<Form.Group as={Row}>
+                            <Form.Label>prefix {this.state.prefix} </Form.Label>
+                            <Form.Range value={this.state.prefix} min={1} max={10} onChange={e => this.setState({prefix: parseInt(e.target.value, 10)})}/>
+                        </Form.Group>*/}
+                    </Form>
+                    <Button variant="outline-danger" onClick={this.applyLLM}>generate</Button>{' '}<br />
+                    </div>
+                  :
+                  <>
+                  </>
+                }
                 {this.state.mode === "markov" ?
                   <div className="App-text">
                     <Form>
@@ -481,12 +509,12 @@ class App extends Component<xTXTProps, xTXTState> {
                             <Form.Range value={this.state.prefix} min={1} max={10} onChange={e => this.setState({prefix: parseInt(e.target.value, 10)})}/>
                         </Form.Group>
                     </Form>
-                    <Button variant="outline-danger" onClick={this.applyMarkov}>apply</Button>{' '}<br />
+                    <Button variant="outline-danger" onClick={this.applyMarkov}>generate</Button>{' '}<br />
                     </div>
                   :
                   <>
                   </>
-              }
+                }
                 {this.state.mode === "lsystem" ?
                   <div className="App-text">
                     <Form>
@@ -499,7 +527,7 @@ class App extends Component<xTXTProps, xTXTState> {
                   :
                   <>
                   </>
-              }
+                }
                 {this.state.mode === "grammar" ?
                   <div className="App-text">
                     <Form>
