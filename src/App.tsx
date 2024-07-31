@@ -11,6 +11,7 @@ import Form from 'react-bootstrap/Form'
 import ButtonGroup from 'react-bootstrap/ButtonGroup'
 import ToggleButton from 'react-bootstrap/ToggleButton'
 import Dropdown from 'react-bootstrap/Dropdown'
+import Spinner from 'react-bootstrap/Spinner';
 
 import { Info } from "./Info"
 
@@ -22,6 +23,8 @@ import parser from "./grammar.js"
 import Markov from 'js-markov'
 
 import superstring from "./superstring"
+
+import * as webllm from "@mlc-ai/web-llm";
 
 const modes = [
     { name: 'methods', value: 'methods' },
@@ -42,6 +45,8 @@ const examples: { [id: string] : IExample[]} = {
         {title: "poem 2", content: "write a funny poem"},
         {title: "poem 3", content: "write a sad poem in spanish"},
         {title: "poem 4", content: "write a crazy poem by using only numbers and uppercase letters"},
+        {title: "poem 5", content: "write an experimental poem titled 'neverland'"},
+        {title: "poem 6", content: "write a nasty poem titled 'hurribly'"},
     ],
     "methods": [
     ],
@@ -76,13 +81,18 @@ const examples: { [id: string] : IExample[]} = {
 }
 
 interface xTXTState {
-  mode: string
-  text: string
-  undoText: string
-  sourceText: string
-  prefix: number
-  showInfo: boolean
-  showSettings: boolean
+    statusLabel: string
+    mode: string
+    text: string
+    undoText: string
+    sourceText: string
+    prefix: number
+    showInfo: boolean
+    showSettings: boolean
+    llmEngine?: webllm.MLCEngineInterface
+    generating: boolean
+    loading: boolean
+    temperature: number
 }
  
 interface xTXTProps {
@@ -119,12 +129,17 @@ class App extends Component<xTXTProps, xTXTState> {
         }
         this.state = {
             mode: "methods", 
+            statusLabel: "",
             text: text, 
             undoText: "", 
             sourceText:"", 
             prefix: 3,
             showInfo: false,
-            showSettings: false
+            showSettings: false,
+            llmEngine: undefined, 
+            generating: false, 
+            loading: false, 
+            temperature: 0.7
         }          
 
         this.speak = this.speak.bind(this)
@@ -135,11 +150,14 @@ class App extends Component<xTXTProps, xTXTState> {
 
         this.applyMarkov = this.applyMarkov.bind(this)
         this.applyGrammar = this.applyGrammar.bind(this)
+        this.applyLLM = this.applyLLM.bind(this)
         this.convertGrammar = this.convertGrammar.bind(this)
         this.applyLSystem = this.applyLSystem.bind(this)
 
         this.undo = this.undo.bind(this)
         this.clear = this.clear.bind(this)
+
+        this.loadModel = this.loadModel.bind(this)
     }
 
     storeText(text: string) {
@@ -195,8 +213,82 @@ class App extends Component<xTXTProps, xTXTState> {
         }
     }
 
-    applyLLM() {
+    setLoading(loa: boolean) {
+      this.setState( {loading: loa});
+    }
 
+    setStatusLabel(text: string) {
+        this.setState({ statusLabel: text });
+    }
+
+    async loadLLMModel() {
+        const selectedModel = "Llama-3.1-8B-Instruct-q4f32_1-MLC";
+
+        const initProgressCallback = (report: webllm.InitProgressReport) => {
+            this.setStatusLabel(report.text);
+        };
+
+        console.log("loading LLM...");
+
+        const engine: webllm.MLCEngineInterface = await webllm.CreateMLCEngine(
+            selectedModel,
+            {
+                initProgressCallback: initProgressCallback,
+                logLevel: "INFO", // specify the log level
+            },
+            // customize kv cache, use either context_window_size or sliding_window_size (with attention sink)
+            {
+                context_window_size: 2048,
+                // sliding_window_size: 1024,
+                // attention_sink_size: 4,
+            },
+        );
+
+        return engine;
+        }
+
+        async loadModel() {
+        this.setLoading(true);
+
+        this.loadLLMModel().then(engine => {
+            console.log("engine:", engine);
+            this.setState({ llmEngine: engine });
+            this.setLoading(false);
+        });
+    }
+
+    setGenerating(gen: boolean) {
+        this.setState( {generating: gen});
+    }
+
+    async generate() {
+        try {
+            const reply = this.state.llmEngine?.chat.completions.create({
+            messages: [{ role: "user", content: this.state.sourceText }],
+            // below configurations are all optional
+            n: 1,
+            temperature: this.state.temperature,
+            max_tokens: 256,
+            logprobs: true,
+            top_logprobs: 2,
+            });
+
+            return reply;
+        }
+        catch (error) {
+            console.log(error);
+        }
+        return null;
+    }
+
+    async applyLLM() {
+        this.setGenerating(true);
+
+        this.generate().then(reply => {
+            console.log("reply:", reply);
+            this.setState({text: reply?.choices[0].message.content ?? "an error occured"});
+            this.setGenerating(false);
+        });
     }
 
     applyMarkov() {
@@ -483,20 +575,40 @@ class App extends Component<xTXTProps, xTXTState> {
                 : <></>}
                 {this.state.mode === "llm" ?
                   <div className="App-text">
-                    <Form>
+                    {this.state.llmEngine !== undefined ?
+                        <>
+                        <Form>
                         <Form.Control as="textarea" rows={5} value={this.state.sourceText} onChange={this.handleSourceChange} style={{backgroundColor: "#999999", color: "black"}}
-                                        ref={this.sourceRef} placeholder="enter prompt..." />
+                        ref={this.sourceRef} placeholder="enter prompt..." />
 
-                        {/*<Form.Group as={Row}>
-                            <Form.Label>prefix {this.state.prefix} </Form.Label>
-                            <Form.Range value={this.state.prefix} min={1} max={10} onChange={e => this.setState({prefix: parseInt(e.target.value, 10)})}/>
-                        </Form.Group>*/}
-                    </Form>
-                    <Button variant="outline-danger" onClick={this.applyLLM}>generate</Button>{' '}<br />
-                    </div>
-                  :
-                  <>
-                  </>
+                        <Form.Group as={Row}>
+                        <Form.Label>temperature {this.state.temperature} </Form.Label>
+                        <Form.Range value={(this.state.temperature-0.1)*100} min={0} max={200} onChange={e => this.setState({temperature: 0.1+parseFloat(e.target.value)/100})}/>
+                        </Form.Group>                 
+                        </Form>
+                        <Button variant="outline-danger" onClick={this.applyLLM}>generate</Button>{' '}<br />
+                        {this.state.generating ?
+                        <Spinner animation="border" role="status">
+                        <span className="visually-hidden">Loading...</span>
+                        </Spinner>
+                        : <></>
+                        }
+                        </>
+                        :
+                        <>
+                        <Button variant="outline-danger" onClick={this.loadModel}>Load Model</Button>{' '}<br />
+                        <p>{this.state.statusLabel}</p>
+                        {this.state.loading ?
+                        <>
+                        <Spinner animation="border" role="status">
+                        <span className="visually-hidden">Loading...</span>
+                        </Spinner>
+                        <p>Loading Model...</p>
+                        </> : <></>}
+                        </>
+                    }
+                  </div>
+                  : <></>
                 }
                 {this.state.mode === "markov" ?
                   <div className="App-text">
