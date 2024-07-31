@@ -1,10 +1,5 @@
 # TODO
 
-LLM.js einbauen:
-https://rahuldshetty.github.io/llm.js/#/
-oder web-llm
-https://www.npmjs.com/package/@mlc-ai/web-llm
-
 settings
 
 - language (for speech)
@@ -61,3 +56,12 @@ refactor to typescript
 move more functions into superstring
 
 info box
+
+web-llm
+https://www.npmjs.com/package/@mlc-ai/web-llm
+
+export docx
+https://www.npmjs.com/package/docx
+
+- change llm engines
+https://llm.mlc.ai/docs/deploy/webllm.html#model-records-in-webllm

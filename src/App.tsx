@@ -11,7 +11,7 @@ import Form from 'react-bootstrap/Form'
 import ButtonGroup from 'react-bootstrap/ButtonGroup'
 import ToggleButton from 'react-bootstrap/ToggleButton'
 import Dropdown from 'react-bootstrap/Dropdown'
-import Spinner from 'react-bootstrap/Spinner';
+import Spinner from 'react-bootstrap/Spinner'
 
 import { Info } from "./Info"
 
@@ -24,7 +24,11 @@ import Markov from 'js-markov'
 
 import superstring from "./superstring"
 
-import * as webllm from "@mlc-ai/web-llm";
+import * as webllm from "@mlc-ai/web-llm"
+
+import { DocExporter } from './DocExporter'
+import { saveAs } from "file-saver";
+import { Packer } from "docx";
 
 const modes = [
     { name: 'methods', value: 'methods' },
@@ -93,6 +97,7 @@ interface xTXTState {
     generating: boolean
     loading: boolean
     temperature: number
+    selectedLLMModelID: string
 }
  
 interface xTXTProps {
@@ -139,7 +144,8 @@ class App extends Component<xTXTProps, xTXTState> {
             llmEngine: undefined, 
             generating: false, 
             loading: false, 
-            temperature: 0.7
+            temperature: 0.7,
+            selectedLLMModelID: this.getLocalStorage<string>("selectedLLMModelID", "Llama-3.1-8B-Instruct-q4f32_1-MLC"),
         }          
 
         this.speak = this.speak.bind(this)
@@ -158,6 +164,9 @@ class App extends Component<xTXTProps, xTXTState> {
         this.clear = this.clear.bind(this)
 
         this.loadModel = this.loadModel.bind(this)
+        this.exportDoc = this.exportDoc.bind(this)
+
+        this.changeLLMModel = this.changeLLMModel.bind(this)
     }
 
     storeText(text: string) {
@@ -222,7 +231,7 @@ class App extends Component<xTXTProps, xTXTState> {
     }
 
     async loadLLMModel() {
-        const selectedModel = "Llama-3.1-8B-Instruct-q4f32_1-MLC";
+        const selectedModel = this.state.selectedLLMModelID;
 
         const initProgressCallback = (report: webllm.InitProgressReport) => {
             this.setStatusLabel(report.text);
@@ -480,6 +489,19 @@ class App extends Component<xTXTProps, xTXTState> {
         this.changeText(() => {return "";});
     }
 
+    setLocalStorage(key: string, value: any) {
+        localStorage.setItem(key, JSON.stringify(value));
+    }
+
+    getLocalStorage<T>(key: string, defaultValue: T): T {
+        let storedValue = localStorage.getItem(key);
+        if (storedValue == null) {
+            this.setLocalStorage(key, defaultValue);
+            return defaultValue;
+        }
+        return JSON.parse(storedValue);
+    }
+
     storeSource(sourceText: string) {
         localStorage.setItem("xtxt-modestorage-"+this.state.mode, sourceText)
     }
@@ -501,17 +523,39 @@ class App extends Component<xTXTProps, xTXTState> {
         this.setState({sourceText: ex});
     }
 
+    changeLLMModel(event: ChangeEvent<HTMLSelectElement>) {
+        let modelID = event.target.value;
+        this.setLocalStorage("selectedLLMModelID", modelID);
+        this.setState({selectedLLMModelID: modelID});
+    }
+
     settings() {
         return (
             <Offcanvas show={this.state.showSettings} onHide={() => {this.setState({showSettings: false})}}>
                 <Offcanvas.Header closeButton closeVariant="white">
                     <Offcanvas.Title>Settings</Offcanvas.Title>
                 </Offcanvas.Header>
-                <Offcanvas.Body>
-
+                <Offcanvas.Body>       
+                    Choose language model:
+                    <Form.Select aria-label="select language model" value={this.state.selectedLLMModelID} onChange={this.changeLLMModel}>
+                        {webllm.prebuiltAppConfig.model_list.map(model => {
+                            return <option value={model.model_id} key={model.model_id}>{model.model_id}{' - '}{model.vram_required_MB}</option>
+                        })}
+                    </Form.Select>      
                 </Offcanvas.Body>
             </Offcanvas>
         );
+    }
+
+    exportDoc() {
+        const docExporter = new DocExporter();
+        const doc = docExporter.create(this.state.text);
+
+        Packer.toBlob(doc).then(blob => {
+            console.log(blob);
+            saveAs(blob, "generated-text.docx");
+            console.log("Document created successfully");
+        });
     }
 
     render() {
@@ -669,7 +713,8 @@ class App extends Component<xTXTProps, xTXTState> {
                 <Button variant="outline-success" onClick={this.undo}>undo</Button>{' '}
                 <Button variant="outline-success" onClick={this.clear}>clear</Button>{' '}<br />
                 <Button variant="outline-success" onClick={this.speak}>speak</Button>{' '}
-                <Button variant="outline-danger" onClick={this.stopSpeech}>stop</Button>{' '}
+                <Button variant="outline-danger" onClick={this.stopSpeech}>stop</Button>{' '}<br />
+                <Button variant="outline-success" onClick={this.exportDoc}>export .docx</Button>{' '}
             </div>
             <div>
                 <p>this is a project by <a href="https://joerg.piringer.net/">jörg piringer</a></p>
