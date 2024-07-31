@@ -285,9 +285,12 @@ class App extends Component<xTXTProps, xTXTState> {
         this.setGenerating(true);
 
         this.generate().then(reply => {
-            console.log("reply:", reply);
-            this.setState({text: reply?.choices[0].message.content ?? "an error occured"});
-            this.setGenerating(false);
+            console.log("reply:", reply)
+
+            const result = reply?.choices[0].message.content ?? "an error occured"
+            this.setState({text: result})
+            this.storeText(result)
+            this.setGenerating(false)
         });
     }
 

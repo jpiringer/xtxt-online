@@ -12,7 +12,8 @@ label {
 
 
 p {
-    color: white;
+  font-size: 0.75em;
+  color: white;
 }
 
 .App {
@@ -95,4 +96,8 @@ p {
 
 .form-control:focus{
   color:black;
+}
+
+.form-label {
+  font-size: 0.75em;
 }
