@@ -30,6 +30,7 @@
     "speak-tts": "^2.0.8",
     "speech-synth": "^1.0.1",
     "typescript": "^5.3.3",
+    "typescript-optional": "^3.0.0-alpha.3",
     "web-vitals": "^1.1.2"
   },
   "overrides": {

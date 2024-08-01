@@ -1,13 +1,4 @@
-import {
-  AlignmentType,
-  Document,
-  HeadingLevel,
-  Packer,
-  Paragraph,
-  TabStopPosition,
-  TabStopType,
-  TextRun
-} from "docx";
+import { Document, Paragraph, TextRun } from "docx"
 
 export class DocExporter {
 	public create(text: string): Document {
@@ -22,8 +13,8 @@ export class DocExporter {
 					}),
 				],
 			}],
-		});
+		})
 
-		return doc;
+		return doc
 	}
 }

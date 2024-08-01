@@ -1,8 +1,6 @@
 # TODO
 
-settings
-
-- language (for speech)
+llm auf verschiedenen maschinen testen
 
 better user interface
 
@@ -13,6 +11,7 @@ grammar
 project manager?
 
 grafik?
+
 
 ## DONE
 
@@ -65,3 +64,15 @@ https://www.npmjs.com/package/docx
 
 - change llm engines
 https://llm.mlc.ai/docs/deploy/webllm.html#model-records-in-webllm
+
+
+modularisierung
+alle modes in extra klassen
+
+settings
+- language (for speech)
+testen!
+
+uplift language model engine state
+
+prompt generator als grammar example

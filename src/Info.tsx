@@ -7,7 +7,7 @@ type InfoProps = {
 	onHide: () => void
 }
 
-export function Info({show, onHide}: InfoProps) {
+export default function Info({show, onHide}: InfoProps) {
 	return (
 		<Modal show={show} onHide={onHide} animation={true}>
 			<Modal.Header closeButton className="blackmodal" closeVariant="white">
