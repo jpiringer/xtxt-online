@@ -5,11 +5,10 @@ import Row from 'react-bootstrap/Row'
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
 import Spinner from 'react-bootstrap/Spinner'
-import ButtonGroup from 'react-bootstrap/ButtonGroup'
 
 import * as webllm from "@mlc-ai/web-llm"
 
-import { IExample, Examples } from './Examples'
+import { IExample } from './Examples'
 
 const examples: IExample[] = [
     {title: "poem", content: "write a poem"},

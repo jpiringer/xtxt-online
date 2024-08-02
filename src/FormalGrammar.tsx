@@ -3,11 +3,10 @@ import { ChangeEvent } from 'react'
 
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
-import ButtonGroup from 'react-bootstrap/ButtonGroup'
 
 import parser from "./grammar.js"
 
-import { IExample, Examples } from './Examples'
+import { IExample } from './Examples'
 
 const examples: IExample[] = [
 	{title: "tutorial 1", content: "# tutorial 1\nSTART = begin; # a START symbol is always needed\n# don't forget the semicolon ; at the end of each line\n"},

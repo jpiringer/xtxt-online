@@ -3,11 +3,10 @@ import { ChangeEvent } from 'react'
 
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
-import ButtonGroup from 'react-bootstrap/ButtonGroup'
 
 import lsystem from "./lsystem.js"
 
-import { IExample, Examples } from './Examples'
+import { IExample } from './Examples'
 
 const examples: IExample[] = [
     {title: "b-language", content: "# b-language\na = aba;\ne = ebe;\ni = ibi;\no = obo;\nu = ubu;\ny = yby;\nä = äbä;\nö = öbö;\nü = übü;"},
