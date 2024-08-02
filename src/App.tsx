@@ -204,8 +204,10 @@ class App extends Component<xTXTProps, xTXTState> {
 
     changeLLMModel(event: ChangeEvent<HTMLSelectElement>) {
         let modelID = event.target.value;
-        this.setLocalStorage("selectedLLMModelID", modelID);
-        this.setState({selectedLLMModelID: modelID});
+        if (modelID !== this.state.selectedLLMModelID) {
+            this.setLocalStorage("selectedLLMModelID", modelID);
+            this.setState({selectedLLMModelID: modelID, llmEngine: undefined});
+        }
     }
 
     changeTTSVoice(event: ChangeEvent<HTMLSelectElement>) {
@@ -227,12 +229,25 @@ class App extends Component<xTXTProps, xTXTState> {
 
     speechSettings() {
         const voices = speechSynthesis.getVoices();
+        const voiceNames = voices.map(voice => {
+            return voice.name
+        })
+
+        let uniqueVoiceNames = voiceNames.filter((voiceName, index) => {
+            return voiceNames.indexOf(voiceName) === index;
+        });
+
+        let getLanguage = (voiceName: string) => {
+            const voice = voices.find(voice => voice.name === voiceName)
+
+            return voice?.lang
+        }
 
         return <>
             Choose text to speech voice:
             <Form.Select aria-label="select tts voice" value={this.state.selectedTTSVoice} onChange={this.changeTTSVoice}>
-                {voices.map(voice => {
-                    return <option value={voice.name} key={voice.name}>{voice.name}{' - '}{voice.lang}</option>
+                {uniqueVoiceNames.map(voiceName => {
+                    return <option value={voiceName} key={voiceName}>{voiceName}{' - '}{getLanguage(voiceName)}</option>
                 })}
             </Form.Select>  
         </>
@@ -245,8 +260,8 @@ class App extends Component<xTXTProps, xTXTState> {
                     <Offcanvas.Title>Settings</Offcanvas.Title>
                 </Offcanvas.Header>
                 <Offcanvas.Body>       
-                    {this.languageModelSettings()}
                     {this.speechSettings()}
+                    {this.languageModelSettings()}
                 </Offcanvas.Body>
             </Offcanvas>
         );

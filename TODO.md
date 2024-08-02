@@ -76,3 +76,13 @@ testen!
 uplift language model engine state
 
 prompt generator als grammar example
+
+anzeige der mb vor laden der llm-engine
+
+auto load wenn precached
+
+duplicates bei tts-voices eliminieren
+
+bei neuer llmEgine auswahl:
+neu laden?
+option?

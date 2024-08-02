@@ -22,6 +22,7 @@ const examples: IExample[] = [
     {title: "recipe", content: "write an absurd recipe"},
     {title: "weather", content: "what will the weather be like on april 1st, 2047?"},
     {title: "joke", content: "tell me a joke please, that start with the phrase 'a microbe, the pope and darth vader walk into a bar'"},
+    {title: "word", content: "invent a new and unknown english word"}
 ]
 
 export interface ILargeLanguageModelProps {
@@ -59,6 +60,12 @@ export default class LargeLanguageModel extends React.Component<ILargeLanguageMo
 		this.apply = this.apply.bind(this)
         this.loadModel = this.loadModel.bind(this)
 	}
+
+    async componentDidMount() {
+        if (await this.modelCached()) {
+            this.loadModel()
+        }   
+    }
 
     setLoading(loa: boolean) {
         this.setState( {loading: loa})
@@ -98,7 +105,6 @@ export default class LargeLanguageModel extends React.Component<ILargeLanguageMo
         return engine
     }
 
-        
     async loadModel() {
         this.setLoading(true);
 
@@ -108,6 +114,14 @@ export default class LargeLanguageModel extends React.Component<ILargeLanguageMo
             this.props.setLLMEngine(engine)
             this.setLoading(false)
         });
+    }
+
+    async modelCached() {
+        const appConfig = webllm.prebuiltAppConfig
+        const selectedModel = this.props.selectedLLMModelID
+
+        let modelCached = await webllm.hasModelInCache(selectedModel, appConfig);
+        return modelCached
     }
 
     async generate() {
@@ -145,6 +159,19 @@ export default class LargeLanguageModel extends React.Component<ILargeLanguageMo
         });
     }
 
+    getVRAMMB() {
+        const model = webllm.prebuiltAppConfig.model_list.find((model) => model.model_id === this.props.selectedLLMModelID) 
+                
+        return model?.vram_required_MB
+    }
+
+    loadModelButton() {
+        return <>
+            <Button variant="outline-danger" onClick={this.loadModel}>Load Model</Button>{' '}<br />
+            <p>{this.getVRAMMB()}{'MB of video ram required'}</p>
+        </>
+    }
+
 	public render() {
 		return (
             <>
@@ -172,7 +199,7 @@ export default class LargeLanguageModel extends React.Component<ILargeLanguageMo
                 </>
                 :
                 <>
-                <Button variant="outline-danger" onClick={this.loadModel}>Load Model</Button>{' '}<br />
+                { this.loadModelButton() }
                 <p>{this.state.statusLabel}</p>
                 {this.state.loading ?
                 <>
