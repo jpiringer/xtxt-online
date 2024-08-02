@@ -3,6 +3,7 @@ import { ChangeEvent } from 'react'
 
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
+import ButtonGroup from 'react-bootstrap/ButtonGroup'
 
 import parser from "./grammar.js"
 
@@ -25,7 +26,7 @@ const examples: IExample[] = [
 export interface IFormalGrammarProps {
 	changeText: (func: (txt: string) => string) => void
 	handleSourceChange: (event: ChangeEvent<HTMLTextAreaElement>) => void
-	setExample: (content: string) => void
+	setExamples: (content: IExample[]) => void
 	sourceText: string
 }
 
@@ -47,7 +48,11 @@ export default class FormalGrammar extends React.Component<IFormalGrammarProps, 
 		this.convert = this.convert.bind(this)
 	}
 
-  apply() {
+	componentDidMount(): void {
+		this.props.setExamples(examples)
+	}
+
+  	apply() {
         this.props.changeText((txt) => {
             var rules: any;
 
@@ -182,12 +187,10 @@ export default class FormalGrammar extends React.Component<IFormalGrammarProps, 
 	public render() {
 		return (
 			<>
-				<Examples examples={examples} setExample={this.props.setExample} />
 				<div className="App-text">
                     <Form>
                         <Form.Control as="textarea" rows={12} value={this.props.sourceText} onChange={this.props.handleSourceChange} style={{backgroundColor: "#999999", color: "black"}}
                                         ref={this.sourceRef} placeholder="enter grammar rules here..." />
-
                     </Form>
                     <Button variant="outline-danger" onClick={this.apply}>generate</Button>{' '}
                     <Button variant="outline-success" onClick={this.convert}>convert</Button>{' '}<br />

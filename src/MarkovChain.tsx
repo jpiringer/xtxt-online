@@ -5,6 +5,7 @@ import Row from 'react-bootstrap/Row'
 
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
+import ButtonGroup from 'react-bootstrap/ButtonGroup'
 
 import Markov from 'js-markov'
 
@@ -22,7 +23,7 @@ const examples: IExample[] = [
 export interface IMarkovProps {
 	changeText: (func: (txt: string) => string) => void
 	handleSourceChange: (event: ChangeEvent<HTMLTextAreaElement>) => void
-	setExample: (content: string) => void
+	setExamples: (content: IExample[]) => void
 	sourceText: string
 }
 
@@ -45,6 +46,10 @@ export default class MarkovChain extends React.Component<IMarkovProps, IMarkovSt
 		this.apply = this.apply.bind(this)
 	}
 
+	componentDidMount(): void {
+		this.props.setExamples(examples)
+	}
+
 	apply() {
 		this.props.changeText((txt) => {
 			let markovChain = new Markov()
@@ -58,7 +63,6 @@ export default class MarkovChain extends React.Component<IMarkovProps, IMarkovSt
 	public render() {
 		return (
 			<>
-				<Examples examples={examples} setExample={this.props.setExample} />
 				<div className="App-text">
 					<Form>
 						<Form.Control as="textarea" rows={12} value={this.props.sourceText} onChange={this.props.handleSourceChange} style={{backgroundColor: "#999999", color: "black"}}

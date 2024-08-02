@@ -3,6 +3,7 @@ import './App.scss'
 import React, { Component, ChangeEvent } from 'react'
 
 import Col from 'react-bootstrap/Col'
+import Row from 'react-bootstrap/Row'
 import Offcanvas from 'react-bootstrap/Offcanvas'
 
 import Button from 'react-bootstrap/Button'
@@ -25,6 +26,8 @@ import { DocExporter } from './DocExporter'
 import { saveAs } from "file-saver";
 import { Packer } from "docx";
 
+import { IExample, Examples } from './Examples'
+
 const modes = [
     { name: 'methods', value: 'methods' },
     { name: 'markov', value: 'markov' },
@@ -43,10 +46,14 @@ interface xTXTState {
     selectedLLMModelID: string
     selectedTTSVoice: string
     llmEngine?: webllm.MLCEngineInterface
+    examples: IExample[]
 }
  
 interface xTXTProps {
 }
+
+const examples: IExample[] = [
+];
 
 class App extends Component<xTXTProps, xTXTState> {
     speech: any
@@ -86,10 +93,12 @@ class App extends Component<xTXTProps, xTXTState> {
             showSettings: false,
             selectedLLMModelID: this.getLocalStorage<string>("selectedLLMModelID", "Llama-3.1-8B-Instruct-q4f32_1-MLC"),
             selectedTTSVoice: this.getLocalStorage<string>("selectedTTSVoice", ""),
+            examples: examples
         }          
 
         this.changeText = this.changeText.bind(this)
         this.setExample = this.setExample.bind(this)
+        this.setExamples = this.setExamples.bind(this)
 
         this.speak = this.speak.bind(this)
         this.stopSpeech = this.stopSpeech.bind(this)
@@ -104,6 +113,10 @@ class App extends Component<xTXTProps, xTXTState> {
 
         this.changeLLMModel = this.changeLLMModel.bind(this)
         this.changeTTSVoice = this.changeTTSVoice.bind(this)
+    }
+
+    setExamples(examples: IExample[]) {
+        this.setState({examples: examples})
     }
 
     storeText(text: string) {
@@ -218,8 +231,8 @@ class App extends Component<xTXTProps, xTXTState> {
 
     languageModelSettings() {
         return <>
-            Choose language model:
-            <Form.Select aria-label="select language model" value={this.state.selectedLLMModelID} onChange={this.changeLLMModel}>
+            Choose large language model:
+            <Form.Select aria-label="select large language model" value={this.state.selectedLLMModelID} onChange={this.changeLLMModel}>
                 {webllm.prebuiltAppConfig.model_list.map(model => {
                     return <option value={model.model_id} key={model.model_id}>{model.model_id}{' - '}{model.vram_required_MB}{'MB'}</option>
                 })}
@@ -281,14 +294,16 @@ class App extends Component<xTXTProps, xTXTState> {
     render() {
       return (
         <div className="App">
-          <header className="App-header">
-            <Col>xTXT online</Col>
-            <Col>
-                <Button variant="outline-success" onClick={() => {this.setState({showInfo: true})}} ><i className="bi bi-info-circle"></i></Button>{' '}
-                <Button variant="outline-danger" onClick={() => {this.setState({showSettings: true})}}><i className="bi bi-gear"></i></Button>
-            </Col>
-          </header>
-          <div className="App-buttons">
+            <header className="App-header">
+                xTXT online
+            </header>
+            <div className="App-buttons">
+                <Row>
+                <Col>
+                    <Button variant="outline-success" onClick={() => {this.setState({showInfo: true})}} ><i className="bi bi-info-circle"></i></Button>{' '}
+                    <Button variant="outline-danger" onClick={() => {this.setState({showSettings: true})}}><i className="bi bi-gear"></i></Button>
+                </Col>
+                <Col xs={8}>
                 <ButtonGroup>
                     {modes.map((radio, idx) => (
                         <ToggleButton
@@ -305,15 +320,21 @@ class App extends Component<xTXTProps, xTXTState> {
                         </ToggleButton>
                     ))}
                 </ButtonGroup>
-                <br />
+                </Col>
+                <Col>
+                    <Examples disabled={this.state.examples.length === 0} examples={this.state.examples} setExample={this.setExample} />
+                </Col>
+                </Row>
                 {this.state.mode === "methods" &&
-                    <Methods changeText={this.changeText} />
+                    <Methods 
+                    changeText={this.changeText} 
+                    setExamples={this.setExamples}/>  
                 }      
                 {this.state.mode === "llm" &&
                     <LargeLanguageModel 
                         changeText={this.changeText} 
                         handleSourceChange={this.handleSourceChange} 
-                        setExample={this.setExample}
+                        setExamples={this.setExamples}
                         sourceText={this.state.sourceText} 
                         selectedLLMModelID= {this.state.selectedLLMModelID} 
                         llmEngine={this.state.llmEngine}
@@ -323,21 +344,21 @@ class App extends Component<xTXTProps, xTXTState> {
                     <MarkovChain 
                         changeText={this.changeText} 
                         handleSourceChange={this.handleSourceChange} 
-                        setExample={this.setExample}
+                        setExamples={this.setExamples}
                         sourceText={this.state.sourceText} />
                 }
                 {this.state.mode === "lsystem" &&
                     <LindenmayerSystem
                         changeText={this.changeText} 
                         handleSourceChange={this.handleSourceChange} 
-                        setExample={this.setExample}
+                        setExamples={this.setExamples}
                         sourceText={this.state.sourceText} />
                 }
                 {this.state.mode === "grammar" &&
                     <FormalGrammar
                         changeText={this.changeText} 
                         handleSourceChange={this.handleSourceChange} 
-                        setExample={this.setExample}
+                        setExamples={this.setExamples}
                         sourceText={this.state.sourceText} />
                 } 
             </div>
@@ -348,11 +369,19 @@ class App extends Component<xTXTProps, xTXTState> {
                 </Form>
             </div>
             <div className="App-buttons">
+                <Row>
+                <Col>
                 <Button variant="outline-success" onClick={this.undo}>undo</Button>{' '}
                 <Button variant="outline-success" onClick={this.clear}>clear</Button>{' '}<br />
+                </Col>
+                <Col>
                 <Button variant="outline-success" onClick={this.speak}>speak</Button>{' '}
                 <Button variant="outline-danger" onClick={this.stopSpeech}>stop</Button>{' '}<br />
+                </Col>
+                <Col>
                 <Button variant="outline-success" onClick={this.exportDoc}>export .docx</Button>{' '}
+                </Col>
+                </Row>
             </div>
             <div>
                 <p>this is a project by <a href="https://joerg.piringer.net/">jörg piringer</a></p>

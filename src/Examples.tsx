@@ -1,14 +1,16 @@
 import React from 'react'
 import Dropdown from 'react-bootstrap/Dropdown'
+import DropdownButton from 'react-bootstrap/DropdownButton';
 
 export interface IExample {
-    title: string
-    content: string
+  title: string
+  content: string
 }
 
 export interface IExamplesProps {
-    examples: IExample[]
-    setExample: (content: string) => void
+  examples: IExample[]
+  setExample: (content: string) => void
+  disabled: boolean
 }
 
 export interface IExamplesState {
@@ -24,17 +26,11 @@ export class Examples extends React.Component<IExamplesProps, IExamplesState> {
 
   public render() {
     return (
-      <Dropdown>
-            <Dropdown.Toggle variant="outline-success" id="dropdown-basic">
-                examples
-            </Dropdown.Toggle>
-
-            <Dropdown.Menu>
-            {this.props.examples.map((example: any, index: number) => (
-                <Dropdown.Item onClick={()=>{this.props.setExample(example.content);}}>{example.title}</Dropdown.Item>
-            ))}
-            </Dropdown.Menu>
-        </Dropdown>
+      <DropdownButton disabled={this.props.disabled} id="dropdown-basic-button" title="examples" variant="outline-success">
+        {this.props.examples.map((example: any, index: number) => (
+          <Dropdown.Item onClick={()=>{this.props.setExample(example.content);}}>{example.title}</Dropdown.Item>
+        ))}
+      </DropdownButton>
     );
   }
 }

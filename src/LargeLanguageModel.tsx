@@ -5,6 +5,7 @@ import Row from 'react-bootstrap/Row'
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
 import Spinner from 'react-bootstrap/Spinner'
+import ButtonGroup from 'react-bootstrap/ButtonGroup'
 
 import * as webllm from "@mlc-ai/web-llm"
 
@@ -28,7 +29,7 @@ const examples: IExample[] = [
 export interface ILargeLanguageModelProps {
 	changeText: (func: (txt: string) => string) => void
 	handleSourceChange: (event: ChangeEvent<HTMLTextAreaElement>) => void
-	setExample: (content: string) => void
+	setExamples: (content: IExample[]) => void
 	sourceText: string
     selectedLLMModelID: string
     llmEngine?: webllm.MLCEngineInterface
@@ -68,6 +69,7 @@ export default class LargeLanguageModel extends React.Component<ILargeLanguageMo
     }
 
     async componentDidMount() {
+		this.props.setExamples(examples)
         this.loadModelIfCached()
     }
 
@@ -186,8 +188,6 @@ export default class LargeLanguageModel extends React.Component<ILargeLanguageMo
 	public render() {
 		return (
             <>
-            <Examples examples={examples} setExample={this.props.setExample} />
-
 			<div className="App-text">
             {this.props.llmEngine !== undefined ?
                 <>
