@@ -61,10 +61,20 @@ export default class LargeLanguageModel extends React.Component<ILargeLanguageMo
         this.loadModel = this.loadModel.bind(this)
 	}
 
-    async componentDidMount() {
+    async loadModelIfCached() {
         if (await this.modelCached()) {
             this.loadModel()
-        }   
+        }  
+    }
+
+    async componentDidMount() {
+        this.loadModelIfCached()
+    }
+
+    async componentDidUpdate(prevProps: Readonly<ILargeLanguageModelProps>, prevState: Readonly<ILargeLanguageModelState>, snapshot?: any) {
+        if (this.props.selectedLLMModelID !== prevProps.selectedLLMModelID) {
+            this.loadModelIfCached()
+        }
     }
 
     setLoading(loa: boolean) {
@@ -113,6 +123,7 @@ export default class LargeLanguageModel extends React.Component<ILargeLanguageMo
             //this.setState({ llmEngine: engine });
             this.props.setLLMEngine(engine)
             this.setLoading(false)
+            this.setStatusLabel("")
         });
     }
 
