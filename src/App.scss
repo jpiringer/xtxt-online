@@ -1,9 +1,13 @@
 @import '~bootstrap/scss/bootstrap';
 @import "bootstrap-icons/font/bootstrap-icons.scss";
 
+$stdFontSize: 0.8em;
+$appFontSize: 1.75em;
+
 html {
   background-color: black;
   color: white;
+  font-size: $stdFontSize;
 }
 
 label {
@@ -12,7 +16,7 @@ label {
 
 
 p {
-  font-size: 0.75em;
+  font-size: $stdFontSize;
   color: white;
 }
 
@@ -48,7 +52,7 @@ p {
     min-height: 2vh;
     align-items: left;
     justify-content: left;
-    font-size: calc(10px + 2vmin);
+    font-size: $stdFontSize;
     color: white;
 }
 
@@ -57,7 +61,7 @@ p {
     min-height: 10vh;
     align-items: left;
     justify-content: left;
-    font-size: calc(10px + 2vmin);
+    font-size: $appFontSize;
     color: white;
     margin: 1em 1em 1em 1em;
 }
@@ -99,5 +103,5 @@ p {
 }
 
 .form-label {
-  font-size: 0.75em;
+  font-size: $stdFontSize;
 }

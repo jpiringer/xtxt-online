@@ -33,7 +33,7 @@ export default class Methods extends React.Component<MethodsProps> {
 	public render() {
 		return (
 			<>
-				{' '}
+				<br />
 				<Row>
 				<Col>
 				<Button variant="outline-primary" onClick={this.changer(superstring.rip)}>rip</Button>{' '}
