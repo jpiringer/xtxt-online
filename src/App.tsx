@@ -23,8 +23,8 @@ import Speech from 'speak-tts'
 import * as webllm from "@mlc-ai/web-llm"
 
 import { DocExporter } from './DocExporter'
-import { saveAs } from "file-saver";
-import { Packer } from "docx";
+import { saveAs } from "file-saver"
+import { Packer } from "docx"
 
 import { IExample, Examples } from './Examples'
 
@@ -134,6 +134,7 @@ class App extends Component<xTXTProps, xTXTState> {
     }
 
     speak() {
+        this.stopSpeech()
         if (this.state.selectedTTSVoice !== "") {
             this.speech.setVoice(this.state.selectedTTSVoice)
         }
@@ -285,9 +286,7 @@ class App extends Component<xTXTProps, xTXTState> {
         const doc = docExporter.create(this.state.text);
 
         Packer.toBlob(doc).then(blob => {
-            console.log(blob);
             saveAs(blob, "generated-text.docx");
-            console.log("Document created successfully");
         });
     }
 

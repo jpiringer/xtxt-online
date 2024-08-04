@@ -4,6 +4,8 @@ import { ChangeEvent } from 'react'
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
 
+import { saveAs } from "file-saver"
+
 import parser from "./grammar.js"
 
 import { IExample } from './Examples'
@@ -44,7 +46,7 @@ export default class FormalGrammar extends React.Component<IFormalGrammarProps, 
 		}
 
 		this.apply = this.apply.bind(this)
-		this.convert = this.convert.bind(this)
+		this.export = this.export.bind(this)
 	}
 
 	componentDidMount(): void {
@@ -120,67 +122,70 @@ export default class FormalGrammar extends React.Component<IFormalGrammarProps, 
     }
 
     convert() {
-        this.props.changeText((txt) => {
-            var rules: any;
-            var output = "";
+        var rules: any;
+        var output = "";
 
-            try {
-                rules = parser.parse(this.props.sourceText)
+        try {
+            rules = parser.parse(this.props.sourceText)
+        }
+        catch (e: any) {
+            return "ERROR: "+e.name + ': ' + e.message;
+        }
+
+        let out = (txt: string) => {
+            output += txt;
+        }
+
+        let removeComma = (comma: string) => {
+            if (output.substring(output.length-comma.length, output.length) === comma) {
+                output = output.substring(0, output.length-comma.length);
             }
-            catch (e: any) {
-                return "ERROR: "+e.name + ': ' + e.message;
-            }
+        }
 
-            let out = (txt: string) => {
-                output += txt;
-            }
+        let outTail = (tail: any) => {
+            console.log(tail);
 
-            let removeComma = (comma: string) => {
-                if (output.substring(output.length-comma.length, output.length) === comma) {
-                    output = output.substring(0, output.length-comma.length);
-                }
-            }
+            for (let tailAlternative of tail) {
+                out("\"");
 
-            let outTail = (tail: any) => {
-                console.log(tail);
-
-                for (let tailAlternative of tail) {
-                    out("\"");
-
-                    for (var verb of tailAlternative) {
-                        if (verb.type === "symbol") {
-                            out("#");
-                            out(verb.text);
-                            out("# ");
-                        }
-                        else {
-                            out(verb.text);
-                            out(" ");
-                        }
+                for (var verb of tailAlternative) {
+                    if (verb.type === "symbol") {
+                        out("#");
+                        out(verb.text);
+                        out("# ");
                     }
-                    removeComma(" ");
-                    out("\",");
+                    else {
+                        out(verb.text);
+                        out(" ");
+                    }
                 }
-                removeComma(",");
+                removeComma(" ");
+                out("\",");
             }
+            removeComma(",");
+        }
 
-            out("// this is a grammar for the javascript generative grammar system tracery: https://www.tracery.io\nconst grammar = \n{\n");
-            for (var r of rules) {
-                var ruleName = r.rule;
-                if (ruleName === "START") {
-                    ruleName = "origin";
-                }
-                if (r.tail !== undefined) {
-                    out("\""+ruleName+"\":[");
-                    outTail(r.tail);
-                    out("],\n");
-                }
+        out("// this is a grammar for the javascript generative grammar system tracery: https://www.tracery.io\nconst grammar = \n{\n");
+        for (var r of rules) {
+            var ruleName = r.rule;
+            if (ruleName === "START") {
+                ruleName = "origin";
             }
-            removeComma(",\n");
-            out("\n}");
+            if (r.tail !== undefined) {
+                out("\""+ruleName+"\":[");
+                outTail(r.tail);
+                out("],\n");
+            }
+        }
+        removeComma(",\n");
+        out("\n}");
 
-            return output;
-        });
+        return output;
+    }
+
+    export() {
+        const blob = new Blob([this.convert()], { type: "text/plain" })
+        saveAs(blob, "grammar-tracery.js")
     }
 
 	public render() {
@@ -192,7 +197,7 @@ export default class FormalGrammar extends React.Component<IFormalGrammarProps, 
                                         ref={this.sourceRef} placeholder="enter grammar rules here..." />
                     </Form>
                     <Button variant="outline-danger" onClick={this.apply}>generate</Button>{' '}
-                    <Button variant="outline-success" onClick={this.convert}>convert</Button>{' '}<br />
+                    <Button variant="outline-success" onClick={this.export}>export .js</Button>{' '}<br />
 				</div>
 			</>
 		);

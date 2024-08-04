@@ -2,6 +2,8 @@
 
 llm auf verschiedenen maschinen testen
 
+record sequence of manipulations
+
 better user interface
 
 grammar
