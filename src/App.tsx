@@ -10,6 +10,7 @@ import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
 import ButtonGroup from 'react-bootstrap/ButtonGroup'
 import ToggleButton from 'react-bootstrap/ToggleButton'
+import Spinner from 'react-bootstrap/Spinner'
 
 import Info from "./Info"
 import Methods from "./Methods"
@@ -37,6 +38,7 @@ const modes = [
 ]
 
 interface xTXTState {
+    busy: boolean
     mode: string
     text: string
     undoText: string
@@ -86,6 +88,7 @@ class App extends Component<xTXTProps, xTXTState> {
             text = "";
         }
         this.state = {
+            busy: false, 
             mode: "methods", 
             text: text, 
             undoText: "", 
@@ -117,6 +120,10 @@ class App extends Component<xTXTProps, xTXTState> {
         this.changeLanguage = this.changeLanguage.bind(this)
         this.changeLLMModel = this.changeLLMModel.bind(this)
         this.changeTTSVoice = this.changeTTSVoice.bind(this)
+    }
+
+    setBusy(b: boolean) {
+        this.setState({busy: b})
     }
 
     setExamples(examples: IExample[]) {
@@ -193,18 +200,19 @@ class App extends Component<xTXTProps, xTXTState> {
                 }
         }
 
+        this.setBusy(true)
         if (cursorStart === cursorEnd) { // process whole text
             promise(this.state.text).then((result: string|Array<string>) => {
                 this.setText(convertToString(result))
+                this.setBusy(false)
             })
         }
         else { // process only a part
             promise(this.state.text.substring(cursorStart,cursorEnd)).then((result: string|Array<string>) => {
                 let newText = this.state.text.substring(0, cursorStart)+convertToString(result)+this.state.text.substring(cursorEnd);
 
-                this.setState({undoText: this.state.text})
-                this.setState({text: newText})
-                this.storeText(newText)
+                this.setText(newText)
+                this.setBusy(false)
             })
         }
     }
@@ -379,6 +387,15 @@ class App extends Component<xTXTProps, xTXTState> {
                     <Examples disabled={this.state.examples.length === 0} examples={this.state.examples} setExample={this.setExample} />
                 </Col>
                 </Row>
+                {this.state.busy &&
+                    <Row>
+                        <Col>
+                            <Spinner animation="border" role="status">
+                                <span className="visually-hidden">Executing...</span>
+                            </Spinner>
+                        </Col>
+                    </Row>
+                }
                 {this.state.mode === "methods" &&
                     <Methods 
                     changeText={this.changeText} 

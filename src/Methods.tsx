@@ -30,6 +30,9 @@ export default class Methods extends React.Component<MethodsProps> {
 		this.containing = this.containing.bind(this)
 		this.letters = this.letters.bind(this)
 		this.vowels = this.vowels.bind(this)
+		this.wordsOfLength = this.wordsOfLength.bind(this)
+		this.wordsOfLengthShorterEq = this.wordsOfLengthShorterEq.bind(this)
+		this.wordsOfLengthLonger = this.wordsOfLengthLonger.bind(this)
 	}
 
 	changer(func: (txt: string) => string) {
@@ -41,11 +44,6 @@ export default class Methods extends React.Component<MethodsProps> {
 	changerAsync(promise: (text: string) => Promise<string>) {
 		return () => {
 			this.props.changeTextAsync(promise)
-			/*promise("").then((responseString: string) => {
-				this.props.changeText((str: string) => {
-					return responseString
-			})
-			})*/
 		}
 	}
 
@@ -103,6 +101,24 @@ export default class Methods extends React.Component<MethodsProps> {
 		return this.fetchPromise(URL)
 	}
 
+	wordsOfLength(text: string): Promise<string> {
+		const URL = WordDataBaseURL+"/length/"+encodeURI(text.length.toString())
+
+		return this.fetchPromise(URL)
+	}
+
+	wordsOfLengthShorterEq(text: string): Promise<string> {
+		const URL = WordDataBaseURL+"/maximum/"+encodeURI(text.length.toString())
+
+		return this.fetchPromise(URL)
+	}
+
+	wordsOfLengthLonger(text: string): Promise<string> {
+		const URL = WordDataBaseURL+"/longer/"+encodeURI(text.length.toString())
+
+		return this.fetchPromise(URL)
+	}
+
 	public render() {
 		return (
 			<>
@@ -127,14 +143,14 @@ export default class Methods extends React.Component<MethodsProps> {
 				<Button variant="outline-primary" onClick={this.changer(superstring.permutate)}>permutate</Button>{' '}
 				<DropdownButton id="dropdown-basic-button" title="words" variant="outline-primary">
 					<Dropdown.Item onClick={this.changerAsync(this.randomWord)}>random word</Dropdown.Item>
-					<Dropdown.Item onClick={this.changerAsync(this.prefix)}>prefix</Dropdown.Item>
-					<Dropdown.Item onClick={this.changerAsync(this.postfix)}>postfix</Dropdown.Item>
-					<Dropdown.Item onClick={this.changerAsync(this.containing)}>containing</Dropdown.Item>
-					<Dropdown.Item onClick={this.changerAsync(this.letters)}>letters</Dropdown.Item>
-					<Dropdown.Item onClick={this.changerAsync(this.vowels)}>vowels</Dropdown.Item>
-					{/*<Dropdown.Item onClick={this.changerAsync(this.randomWord)}>length</Dropdown.Item>
-					<Dropdown.Item onClick={this.changerAsync(this.randomWord)}>shorter or equal</Dropdown.Item>
-					<Dropdown.Item onClick={this.changerAsync(this.randomWord)}>longer</Dropdown.Item>*/}
+					<Dropdown.Item onClick={this.changerAsync(this.prefix)}>words with prefix</Dropdown.Item>
+					<Dropdown.Item onClick={this.changerAsync(this.postfix)}>words with postfix</Dropdown.Item>
+					<Dropdown.Item onClick={this.changerAsync(this.containing)}>words containing string</Dropdown.Item>
+					<Dropdown.Item onClick={this.changerAsync(this.letters)}>words containing letters</Dropdown.Item>
+					<Dropdown.Item onClick={this.changerAsync(this.vowels)}>words containing vowels</Dropdown.Item>
+					<Dropdown.Item onClick={this.changerAsync(this.wordsOfLength)}>words of length</Dropdown.Item>
+					<Dropdown.Item onClick={this.changerAsync(this.wordsOfLengthShorterEq)}>words of length shorter or equal</Dropdown.Item>
+					<Dropdown.Item onClick={this.changerAsync(this.wordsOfLengthLonger)}>words of length longer</Dropdown.Item>
 				</DropdownButton>
 				</Col>
 				</Row>
