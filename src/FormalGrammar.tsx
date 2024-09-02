@@ -28,6 +28,7 @@ export interface IFormalGrammarProps {
 	changeText: (func: (txt: string) => string) => void
 	handleSourceChange: (event: ChangeEvent<HTMLTextAreaElement>) => void
 	setExamples: (content: IExample[]) => void
+    language: string
 	sourceText: string
 }
 

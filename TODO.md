@@ -1,5 +1,26 @@
 # TODO
 
+word-list
+https://github.com/lorenbrichter/Words/tree/master?tab=readme-ov-file
+
+N+7
+
+most-common words
+https://www.npmjs.com/package/most-common-words-by-language
+
+words
+- random word
+- prefix
+- postfix
+- length
+- shorterEq
+- longer
+- containing
+- letters
+- vowels
+
+spinner für generate bei LLM
+
 llm auf verschiedenen maschinen testen
 
 record sequence of manipulations
@@ -10,9 +31,17 @@ grammar
 
 - newline \n
 
-project manager?
+project manager:
+* neues projekt
+* delete projekt
+* export
+* import
 
 grafik?
+
+## BUGS
+
+export .docx macht fehler wenn unicode zeichen
 
 
 ## DONE
@@ -88,3 +117,10 @@ duplicates bei tts-voices eliminieren
 bei neuer llmEgine auswahl:
 neu laden?
 option?
+
+random word
+
+word database
+* server
+* API
+* query

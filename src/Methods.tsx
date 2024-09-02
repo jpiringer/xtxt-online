@@ -3,21 +3,49 @@ import * as React from 'react';
 import Button from 'react-bootstrap/Button'
 import Col from 'react-bootstrap/Col'
 import Row from 'react-bootstrap/Row'
+import Dropdown from 'react-bootstrap/Dropdown'
+import DropdownButton from 'react-bootstrap/DropdownButton';
 import superstring from "./superstring"
 import { IExample } from './Examples'
+
+const WordDataBaseURL = "https://worddatabase-943338cbb7f8.herokuapp.com" // "http://localhost:3001" //
 
 const examples: IExample[] = [
 ];
 
 export interface MethodsProps {
 	changeText: (func: (txt: string) => string) => void
+	changeTextAsync: (promise: (txt: string) => Promise<string>) => void
 	setExamples: (content: IExample[]) => void
+    language: string
 }
 
 export default class Methods extends React.Component<MethodsProps> {
+	constructor(props: MethodsProps) {
+		super(props);
+
+		this.randomWord = this.randomWord.bind(this)
+		this.prefix = this.prefix.bind(this)
+		this.postfix = this.postfix.bind(this)
+		this.containing = this.containing.bind(this)
+		this.letters = this.letters.bind(this)
+		this.vowels = this.vowels.bind(this)
+	}
+
 	changer(func: (txt: string) => string) {
 		return () => {
 			this.props.changeText(func)
+		}
+	}
+
+	changerAsync(promise: (text: string) => Promise<string>) {
+		return () => {
+			this.props.changeTextAsync(promise)
+			/*promise("").then((responseString: string) => {
+				this.props.changeText((str: string) => {
+					return responseString
+			})
+			})*/
 		}
 	}
 
@@ -28,6 +56,51 @@ export default class Methods extends React.Component<MethodsProps> {
 	wordLines(text: string): string {
 		const words = text.split(" ")
 		return words.join("\n")
+	}
+
+	fetchPromise(URL: string) {
+		const lang = this.props.language
+
+		return fetch(URL+"/?lang="+lang, {method: 'GET', headers : {'Accept': 'application/json'}, mode: 'cors'})
+		.then(function(response) {
+			return response.json()
+		})
+	}
+
+	randomWord(text: string): Promise<string> {
+		const URL = WordDataBaseURL+"/random"
+
+		return this.fetchPromise(URL)
+	}
+
+	prefix(text: string): Promise<string> {
+		const URL = WordDataBaseURL+"/prefix/"+encodeURI(text)
+
+		return this.fetchPromise(URL)
+	}
+
+	postfix(text: string): Promise<string> {
+		const URL = WordDataBaseURL+"/postfix/"+encodeURI(text)
+
+		return this.fetchPromise(URL)
+	}
+
+	containing(text: string): Promise<string> {
+		const URL = WordDataBaseURL+"/containing/"+encodeURI(text)
+
+		return this.fetchPromise(URL)
+	}
+
+	letters(text: string): Promise<string> {
+		const URL = WordDataBaseURL+"/letters/"+encodeURI(text)
+
+		return this.fetchPromise(URL)
+	}
+
+	vowels(text: string): Promise<string> {
+		const URL = WordDataBaseURL+"/vowels/"+encodeURI(text)
+
+		return this.fetchPromise(URL)
 	}
 
 	public render() {
@@ -52,6 +125,17 @@ export default class Methods extends React.Component<MethodsProps> {
 				<Button variant="outline-primary" onClick={this.changer(superstring.consOnly)}>cons only</Button>{' '}
 				<Button variant="outline-primary" onClick={this.changer(superstring.duplicate)}>duplicate</Button>{' '}
 				<Button variant="outline-primary" onClick={this.changer(superstring.permutate)}>permutate</Button>{' '}
+				<DropdownButton id="dropdown-basic-button" title="words" variant="outline-primary">
+					<Dropdown.Item onClick={this.changerAsync(this.randomWord)}>random word</Dropdown.Item>
+					<Dropdown.Item onClick={this.changerAsync(this.prefix)}>prefix</Dropdown.Item>
+					<Dropdown.Item onClick={this.changerAsync(this.postfix)}>postfix</Dropdown.Item>
+					<Dropdown.Item onClick={this.changerAsync(this.containing)}>containing</Dropdown.Item>
+					<Dropdown.Item onClick={this.changerAsync(this.letters)}>letters</Dropdown.Item>
+					<Dropdown.Item onClick={this.changerAsync(this.vowels)}>vowels</Dropdown.Item>
+					{/*<Dropdown.Item onClick={this.changerAsync(this.randomWord)}>length</Dropdown.Item>
+					<Dropdown.Item onClick={this.changerAsync(this.randomWord)}>shorter or equal</Dropdown.Item>
+					<Dropdown.Item onClick={this.changerAsync(this.randomWord)}>longer</Dropdown.Item>*/}
+				</DropdownButton>
 				</Col>
 				</Row>
 			</>

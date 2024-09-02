@@ -43,6 +43,7 @@ interface xTXTState {
     sourceText: string
     showInfo: boolean
     showSettings: boolean
+    selectedLanguage: string
     selectedLLMModelID: string
     selectedTTSVoice: string
     llmEngine?: webllm.MLCEngineInterface
@@ -91,12 +92,14 @@ class App extends Component<xTXTProps, xTXTState> {
             sourceText:"", 
             showInfo: false,
             showSettings: false,
+            selectedLanguage: this.getLocalStorage<string>("selectedLanguage", "en"),
             selectedLLMModelID: this.getLocalStorage<string>("selectedLLMModelID", "Llama-3.1-8B-Instruct-q4f32_1-MLC"),
             selectedTTSVoice: this.getLocalStorage<string>("selectedTTSVoice", ""),
             examples: examples
         }          
 
         this.changeText = this.changeText.bind(this)
+        this.changeTextAsync = this.changeTextAsync.bind(this)
         this.setExample = this.setExample.bind(this)
         this.setExamples = this.setExamples.bind(this)
 
@@ -111,6 +114,7 @@ class App extends Component<xTXTProps, xTXTState> {
 
         this.exportDoc = this.exportDoc.bind(this)
 
+        this.changeLanguage = this.changeLanguage.bind(this)
         this.changeLLMModel = this.changeLLMModel.bind(this)
         this.changeTTSVoice = this.changeTTSVoice.bind(this)
     }
@@ -152,12 +156,17 @@ class App extends Component<xTXTProps, xTXTState> {
         window.speechSynthesis.cancel();
     }
 
+    setText(str: string) {
+        this.setState({undoText: this.state.text})
+        this.setState({text: str})
+        this.storeText(str)
+    }
+
     changeText(func: (txt: string) => string) {
         let textVal = this.inputRef.current!
-        let cursorStart = textVal.selectionStart!;
-        let cursorEnd = textVal.selectionEnd!;
+        let cursorStart = textVal.selectionStart!
+        let cursorEnd = textVal.selectionEnd!
 
-        this.setState({undoText: this.state.text});
         var newText = "";
         if (cursorStart === cursorEnd) { // process whole text
             newText = func(this.state.text);
@@ -167,8 +176,37 @@ class App extends Component<xTXTProps, xTXTState> {
 
             newText = this.state.text.substring(0, cursorStart)+str+this.state.text.substring(cursorEnd);
         }
-        this.setState({text: newText});
-        this.storeText(newText);
+        this.setText(newText)
+    }
+
+    changeTextAsync(promise: (txt: string) => Promise<string>) {
+        let textVal = this.inputRef.current!
+        let cursorStart = textVal.selectionStart!
+        let cursorEnd = textVal.selectionEnd!
+
+        let convertToString = (result: string|Array<string>) => {
+            if (typeof result === "string") {
+                    return result as string
+                }
+                else {
+                    return (result as Array<string>).join(" ")
+                }
+        }
+
+        if (cursorStart === cursorEnd) { // process whole text
+            promise(this.state.text).then((result: string|Array<string>) => {
+                this.setText(convertToString(result))
+            })
+        }
+        else { // process only a part
+            promise(this.state.text.substring(cursorStart,cursorEnd)).then((result: string|Array<string>) => {
+                let newText = this.state.text.substring(0, cursorStart)+convertToString(result)+this.state.text.substring(cursorEnd);
+
+                this.setState({undoText: this.state.text})
+                this.setState({text: newText})
+                this.storeText(newText)
+            })
+        }
     }
 
     undo() {
@@ -216,6 +254,12 @@ class App extends Component<xTXTProps, xTXTState> {
         this.setState({sourceText: ex})
     }
 
+    changeLanguage(event: ChangeEvent<HTMLSelectElement>) {
+        let language = event.target.value;
+        this.setLocalStorage("selectedLanguage", language);
+        this.setState({selectedLanguage: language});
+    }
+
     changeLLMModel(event: ChangeEvent<HTMLSelectElement>) {
         let modelID = event.target.value;
         if (modelID !== this.state.selectedLLMModelID) {
@@ -228,6 +272,16 @@ class App extends Component<xTXTProps, xTXTState> {
         let voiceName = event.target.value;
         this.setLocalStorage("selectedTTSVoice", voiceName);
         this.setState({selectedTTSVoice: voiceName});
+    }
+
+    languageSettings() {
+        return <>
+            Choose language:
+            <Form.Select aria-label="select language" value={this.state.selectedLanguage} onChange={this.changeLanguage}>
+                <option value={'en'} key={'en'}>English</option>
+                <option value={'de'} key={'de'}>German</option>
+            </Form.Select>
+        </>
     }
 
     languageModelSettings() {
@@ -273,7 +327,8 @@ class App extends Component<xTXTProps, xTXTState> {
                 <Offcanvas.Header closeButton closeVariant="white">
                     <Offcanvas.Title>Settings</Offcanvas.Title>
                 </Offcanvas.Header>
-                <Offcanvas.Body>       
+                <Offcanvas.Body>     
+                    {this.languageSettings()}  
                     {this.speechSettings()}
                     {this.languageModelSettings()}
                 </Offcanvas.Body>
@@ -327,7 +382,9 @@ class App extends Component<xTXTProps, xTXTState> {
                 {this.state.mode === "methods" &&
                     <Methods 
                     changeText={this.changeText} 
-                    setExamples={this.setExamples}/>  
+                    changeTextAsync={this.changeTextAsync} 
+                    setExamples={this.setExamples} 
+                    language={this.state.selectedLanguage} />
                 }      
                 {this.state.mode === "llm" &&
                     <LargeLanguageModel 
@@ -337,6 +394,7 @@ class App extends Component<xTXTProps, xTXTState> {
                         sourceText={this.state.sourceText} 
                         selectedLLMModelID= {this.state.selectedLLMModelID} 
                         llmEngine={this.state.llmEngine}
+                        language={this.state.selectedLanguage}
                         setLLMEngine={(engine) => {this.setState({llmEngine: engine})}}/>
                 }
                 {this.state.mode === "markov" &&
@@ -344,6 +402,7 @@ class App extends Component<xTXTProps, xTXTState> {
                         changeText={this.changeText} 
                         handleSourceChange={this.handleSourceChange} 
                         setExamples={this.setExamples}
+                        language={this.state.selectedLanguage}
                         sourceText={this.state.sourceText} />
                 }
                 {this.state.mode === "lsystem" &&
@@ -351,6 +410,7 @@ class App extends Component<xTXTProps, xTXTState> {
                         changeText={this.changeText} 
                         handleSourceChange={this.handleSourceChange} 
                         setExamples={this.setExamples}
+                        language={this.state.selectedLanguage}
                         sourceText={this.state.sourceText} />
                 }
                 {this.state.mode === "grammar" &&
@@ -358,6 +418,7 @@ class App extends Component<xTXTProps, xTXTState> {
                         changeText={this.changeText} 
                         handleSourceChange={this.handleSourceChange} 
                         setExamples={this.setExamples}
+                        language={this.state.selectedLanguage}
                         sourceText={this.state.sourceText} />
                 } 
             </div>

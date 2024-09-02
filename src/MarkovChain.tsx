@@ -24,6 +24,7 @@ export interface IMarkovProps {
 	handleSourceChange: (event: ChangeEvent<HTMLTextAreaElement>) => void
 	setExamples: (content: IExample[]) => void
 	sourceText: string
+    language: string
 }
 
 export interface IMarkovState {

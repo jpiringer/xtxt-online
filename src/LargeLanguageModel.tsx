@@ -32,6 +32,7 @@ export interface ILargeLanguageModelProps {
 	sourceText: string
     selectedLLMModelID: string
     llmEngine?: webllm.MLCEngineInterface
+    language: string
     setLLMEngine: (engine: webllm.MLCEngineInterface) => void
 }
 
