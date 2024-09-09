@@ -1,5 +1,8 @@
 # TODO
 
+project manager:
+* import
+
 word-list
 https://github.com/lorenbrichter/Words/tree/master?tab=readme-ov-file
 
@@ -14,12 +17,6 @@ better user interface
 
 grammar
 - newline \n
-
-project manager:
-* neues projekt
-* delete projekt
-* export
-* import
 
 grafik?
 
@@ -121,3 +118,10 @@ word database
 
 words
 progress spinner
+
+App-Icon
+tiny icon
+
+* neues projekt
+* delete projekt
+* export

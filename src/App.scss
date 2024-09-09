@@ -3,6 +3,8 @@
 
 $stdFontSize: 0.8em;
 $appFontSize: 1.75em;
+$infoFontSize: 1.2em;
+$loadFontSize: 2em;
 
 html {
   background-color: black;
@@ -14,10 +16,26 @@ label {
   color: white;
 }
 
-
 p {
   font-size: $stdFontSize;
   color: white;
+}
+
+.infoP {
+  font-size: $infoFontSize;
+}
+
+.loadP {
+  font-size: $loadFontSize;
+}
+
+.infoImage {
+  width: 64px;
+  height: 64px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 1em;
 }
 
 .App {
@@ -79,6 +97,7 @@ p {
 .blackmodal {
   background-color: #303030;
   color: white;
+  font-size: 12px;
 }
 
 .heading {
@@ -104,4 +123,11 @@ p {
 
 .form-label {
   font-size: $stdFontSize;
+}
+
+.inline-project-button {
+  float: right;
+  border: 0px;
+  color: red;
+  background-color: white;
 }

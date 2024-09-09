@@ -11,6 +11,7 @@ import Form from 'react-bootstrap/Form'
 import ButtonGroup from 'react-bootstrap/ButtonGroup'
 import ToggleButton from 'react-bootstrap/ToggleButton'
 import Spinner from 'react-bootstrap/Spinner'
+import Modal from 'react-bootstrap/Modal'
 
 import Info from "./Info"
 import Methods from "./Methods"
@@ -18,6 +19,11 @@ import MarkovChain from "./MarkovChain"
 import FormalGrammar from './FormalGrammar'
 import LindenmayerSystem from './LindenmayerSystem'
 import LargeLanguageModel from './LargeLanguageModel'
+
+import { Project } from "./Project"
+import ProjectItem from "./models/ProjectItem"
+import { ProjectList } from "./ProjectList"
+import { db } from "./models/db"
 
 import Speech from 'speak-tts'
 
@@ -28,6 +34,8 @@ import { saveAs } from "file-saver"
 import { Packer } from "docx"
 
 import { IExample, Examples } from './Examples'
+
+type ExportType = "docx" | "JSON"
 
 const modes = [
     { name: 'methods', value: 'methods' },
@@ -45,6 +53,11 @@ interface xTXTState {
     sourceText: string
     showInfo: boolean
     showSettings: boolean
+    showProjectManager: boolean
+    showExport: boolean
+    exportType: ExportType
+    selectedProjectNr: number
+    currentProject?: Project
     selectedLanguage: string
     selectedLLMModelID: string
     selectedTTSVoice: string
@@ -82,7 +95,9 @@ class App extends Component<xTXTProps, xTXTState> {
             console.error("An error occured while initializing : ", e)
         })
 
-        var text = localStorage.getItem("xtxt-text");
+        var text = localStorage.getItem("xtxt-text")
+
+        db.projects.mapToClass(Project)
 
         if (text === undefined || text === null) {
             text = "";
@@ -93,8 +108,12 @@ class App extends Component<xTXTProps, xTXTState> {
             text: text, 
             undoText: "", 
             sourceText:"", 
+            exportType: "docx",
             showInfo: false,
             showSettings: false,
+            showProjectManager: false,
+            showExport: false,
+            selectedProjectNr: -1,
             selectedLanguage: this.getLocalStorage<string>("selectedLanguage", "en"),
             selectedLLMModelID: this.getLocalStorage<string>("selectedLLMModelID", "Llama-3.1-8B-Instruct-q4f32_1-MLC"),
             selectedTTSVoice: this.getLocalStorage<string>("selectedTTSVoice", ""),
@@ -115,11 +134,19 @@ class App extends Component<xTXTProps, xTXTState> {
         this.undo = this.undo.bind(this)
         this.clear = this.clear.bind(this)
 
-        this.exportDoc = this.exportDoc.bind(this)
+        this.doExport = this.doExport.bind(this)
+        this.showExport = this.showExport.bind(this)
+        this.hideExport = this.hideExport.bind(this)
+        this.onExportTypeChange = this.onExportTypeChange.bind(this)
 
         this.changeLanguage = this.changeLanguage.bind(this)
         this.changeLLMModel = this.changeLLMModel.bind(this)
         this.changeTTSVoice = this.changeTTSVoice.bind(this)
+
+        this.makeNewProject = this.makeNewProject.bind(this)
+        this.onProjectNameChange = this.onProjectNameChange.bind(this)
+        this.showProjectManager = this.showProjectManager.bind(this)
+        this.hideProjectManager = this.hideProjectManager.bind(this)
     }
 
     setBusy(b: boolean) {
@@ -131,7 +158,8 @@ class App extends Component<xTXTProps, xTXTState> {
     }
 
     storeText(text: string) {
-        localStorage.setItem("xtxt-text", text);
+        //localStorage.setItem("xtxt-text", text)
+        this.getCurrentProject()!.setResults(text)
     }
 
     handleChange(event: ChangeEvent<HTMLTextAreaElement>) {
@@ -242,19 +270,50 @@ class App extends Component<xTXTProps, xTXTState> {
     }
 
     storeSource(sourceText: string) {
-        localStorage.setItem("xtxt-modestorage-"+this.state.mode, sourceText)
+        switch (this.state.mode) {
+            case 'methods':
+                break
+            case 'markov':
+                this.getCurrentProject()!.setMarkov(sourceText)
+                break
+            case 'llm':
+                this.getCurrentProject()!.setLLM(sourceText)
+                break
+            case 'lsystem':
+                this.getCurrentProject()!.setLSystem(sourceText)
+                break
+            case 'grammar':
+                this.getCurrentProject()!.setGrammar(sourceText)
+                break
+        }
+    }
+
+    getStoredSourceOfProject(project: Project, mode: string): string {
+        switch (mode) {
+            case 'methods':
+                return ""
+            case 'markov':
+                return project.getMarkov()
+            case 'llm':
+                return project.getLLM()
+            case 'lsystem':
+                return project.getLSystem()
+            case 'grammar':
+                return project.getGrammar()
+        }
+        return ""
     }
 
     setMode(m: string) {
         this.storeSource(this.state.sourceText);
 
-        var stored = localStorage.getItem("xtxt-modestorage-"+m)
+        var stored = this.getStoredSourceOfProject(this.getCurrentProject()!, m) //localStorage.getItem("xtxt-modestorage-"+m)
 
         if (stored === undefined || stored === null) {
-            stored = "";
+            stored = ""
         }
         
-        this.setState({mode: m, sourceText: stored});
+        this.setState({mode: m, sourceText: stored})
     }
 
     setExample(ex: string) {
@@ -288,6 +347,8 @@ class App extends Component<xTXTProps, xTXTState> {
             <Form.Select aria-label="select language" value={this.state.selectedLanguage} onChange={this.changeLanguage}>
                 <option value={'en'} key={'en'}>English</option>
                 <option value={'de'} key={'de'}>German</option>
+                <option value={'es'} key={'es'}>Spanish</option>
+                <option value={'fr'} key={'fr'}>French</option>
             </Form.Select>
         </>
     }
@@ -336,6 +397,12 @@ class App extends Component<xTXTProps, xTXTState> {
                     <Offcanvas.Title>Settings</Offcanvas.Title>
                 </Offcanvas.Header>
                 <Offcanvas.Body>     
+                    { this.getCurrentProject() !== undefined && 
+                        <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+                        <Form.Label>Project title:</Form.Label>
+                        <Form.Control type="input" placeholder="project title" value={this.getCurrentProject()!.getTitle()} onChange={this.onProjectNameChange}/>
+                        </Form.Group>
+                    }
                     {this.languageSettings()}  
                     {this.speechSettings()}
                     {this.languageModelSettings()}
@@ -344,31 +411,177 @@ class App extends Component<xTXTProps, xTXTState> {
         );
     }
 
-    exportDoc() {
+    exportDoc(fileName: string) {
         const docExporter = new DocExporter();
         const doc = docExporter.create(this.state.text);
 
         Packer.toBlob(doc).then(blob => {
-            saveAs(blob, "generated-text.docx");
+            saveAs(blob, fileName+".docx");
         });
+    }
+
+    exportJSON(fileName: string) {
+        let jsonString = this.getCurrentProject()!.exportToJSON()
+
+        const file = new Blob([jsonString], { type: 'text/plain' })
+        const link = document.createElement('a')
+        link.download = fileName+".json"
+        link.href = URL.createObjectURL(file)
+        link.click()
+        URL.revokeObjectURL(link.href)
+    }
+
+    getCurrentProject() {
+        return this.state.currentProject
+    }
+
+    openProjectNr(projectIndex: number) {
+        db.getProjects().then(
+            (projects) => {
+                let project = projects[this.state.selectedProjectNr] as Project
+                project.setUpdater(() => {this.updateProject()})
+                this.setState({currentProject: project, text: project.getResults(), sourceText: this.getStoredSourceOfProject(project, this.state.mode)})
+            }
+        )
+    }
+
+    updateProject() {
+        this.setState({currentProject: this.state.currentProject})
+    }
+
+    createNewProject() {
+        return new Project(() => {this.updateProject()}, "", "", "", "", "")
+    }
+
+    makeNewProject() {
+        var newProject = this.createNewProject()
+
+        this.setState({currentProject: newProject, text: newProject.getResults(), sourceText: this.getStoredSourceOfProject(newProject, this.state.mode)})
+    }
+
+    onProjectNameChange(event: ChangeEvent<HTMLInputElement>) {
+        if (this.getCurrentProject() !== undefined) {
+            this.getCurrentProject()!.setTitle(event.target.value)
+        }
+    }
+
+    openProject() {
+        this.openProjectNr(this.state.selectedProjectNr)
+        this.hideProjectManager()
+    }
+
+    deleteProject(id: number) {
+        var current = this.getCurrentProject()
+
+        if (current !== undefined) {
+            if (current.id === id) {
+                this.setState({currentProject: undefined})
+            }
+        }
+
+        db.deleteProject(id)
+    }
+
+    projectManager() {
+        return (
+        <Modal show={this.state.showProjectManager} onHide={this.hideProjectManager} animation={true}>
+            <Modal.Header closeButton className="blackmodal" closeVariant="white">
+            <Modal.Title>Project Manager</Modal.Title>
+            </Modal.Header>
+            <ProjectList 
+            selected={this.state.selectedProjectNr} 
+            onSelect={(index: number) => {this.setState({selectedProjectNr: index})}}
+            onOpen={() => {this.openProject()}}
+            onDelete={(index: number) => {this.deleteProject(index)}}
+            />
+            
+            <Modal.Footer className="blackmodal">
+                <Col>
+                <Button variant="primary" onClick={() => {this.makeNewProject(); this.hideProjectManager();}}>New Project</Button>
+                </Col>
+                <Col>
+                <Button variant="success" disabled={this.state.selectedProjectNr < 0} onClick={() => {this.openProject()}}>Open Project</Button>{' '}
+                
+                <Button variant="primary" onClick={this.hideProjectManager}>Cancel</Button>
+                </Col>
+            </Modal.Footer>
+        </Modal>
+        )
+    }
+
+    showProjectManager() {
+        this.setState({showProjectManager: true, selectedProjectNr: -1});
+    }
+
+    hideProjectManager() {
+        this.setState({showProjectManager: false});
+    }
+
+    doExport() {
+        if (this.state.exportType === "docx") {
+            this.exportDoc(this.getCurrentProject()!.getTitle())
+        }
+        else if (this.state.exportType === "JSON") {
+            this.exportJSON(this.getCurrentProject()!.getTitle())
+        }
+    }
+
+    showExport() {
+        this.setState({showExport: true});
+    }
+
+    hideExport() {
+        this.setState({showExport: false});
+    }
+
+    onExportTypeChange(event: ChangeEvent<HTMLInputElement>) {
+        this.setState({exportType: event.target.value as ExportType});
+    }
+
+    export() {
+        return (
+        <Modal show={this.state.showExport} onHide={this.hideExport} animation={true}>
+            <Modal.Header closeButton className="blackmodal" closeVariant="white">
+                <Modal.Title>Export</Modal.Title>
+            </Modal.Header>
+            <Modal.Body className="blackmodal">
+                <Form>
+                <div className="mb-3">
+                    <Form.Check inline label=".docx" value="docx" name="group1" type="radio" checked={this.state.exportType === "docx"} onChange={this.onExportTypeChange} id="docx" />
+                    <Form.Check inline label="JSON" value="JSON" name="group1" type="radio" checked={this.state.exportType === "JSON"} onChange={this.onExportTypeChange} id="json" />
+                </div>
+                </Form>
+            </Modal.Body>
+            <Modal.Footer className="blackmodal">
+                <Button variant="success" onClick={this.doExport}>
+                Export
+                </Button>
+                <Button variant="primary" onClick={this.hideExport}>
+                Close
+                </Button>
+            </Modal.Footer>
+        </Modal>
+        );
     }
 
     render() {
       return (
         <div className="App">
             <header className="App-header">
-                xTXT online
+                xTXT online {this.getCurrentProject() !== undefined && " - Project '"+this.getCurrentProject()?.getTitle()+"'"}
             </header>
             <div className="App-buttons">
                 <Row>
-                <Col>
+                <Col xs={3}>
                     <Button variant="outline-success" onClick={() => {this.setState({showInfo: true})}} ><i className="bi bi-info-circle"></i></Button>{' '}
-                    <Button variant="outline-danger" onClick={() => {this.setState({showSettings: true})}}><i className="bi bi-gear"></i></Button>
+                    <Button variant="outline-danger" onClick={() => {this.setState({showSettings: true})}}><i className="bi bi-gear"></i></Button>{' '}
+                    <Button variant="outline-success" onClick={this.showProjectManager}>Manage Projects</Button>
                 </Col>
-                <Col xs={8}>
+                <Col xs={6}>
                 <ButtonGroup>
                     {modes.map((radio, idx) => (
                         <ToggleButton
+                        disabled={this.getCurrentProject() === undefined}
                         key={idx}
                         id={`radio-${idx}`}
                         type="radio"
@@ -383,10 +596,11 @@ class App extends Component<xTXTProps, xTXTState> {
                     ))}
                 </ButtonGroup>
                 </Col>
-                <Col>
+                <Col xs={2}>
                     <Examples disabled={this.state.examples.length === 0} examples={this.state.examples} setExample={this.setExample} />
                 </Col>
                 </Row>
+                {this.getCurrentProject() !== undefined && <>
                 {this.state.busy &&
                     <Row>
                         <Col>
@@ -438,7 +652,13 @@ class App extends Component<xTXTProps, xTXTState> {
                         language={this.state.selectedLanguage}
                         sourceText={this.state.sourceText} />
                 } 
+                </>}
+                {this.getCurrentProject() === undefined && <>
+                    <p className='loadP'>please create or load a project</p>
+                    <p><Button variant="outline-success" onClick={this.showProjectManager}>Manage Projects</Button></p>
+                </>}
             </div>
+            {this.getCurrentProject() !== undefined && <>
             <div className="App-text">
                 <Form>
                     <Form.Control as="textarea" rows={12} value={this.state.text} onChange={this.handleChange} style={{backgroundColor: "#999999", color: "black"}}
@@ -456,15 +676,18 @@ class App extends Component<xTXTProps, xTXTState> {
                 <Button variant="outline-danger" onClick={this.stopSpeech}>stop</Button>{' '}<br />
                 </Col>
                 <Col>
-                <Button variant="outline-success" onClick={this.exportDoc}>export .docx</Button>{' '}
+                <Button variant="outline-success" onClick={this.showExport}><i className="bi bi-box-arrow-down"></i></Button>{' '}
                 </Col>
                 </Row>
             </div>
+            </>}
             <div>
                 <p>this is a project by <a href="https://joerg.piringer.net/">jörg piringer</a></p>
             </div>
             <Info show={this.state.showInfo} onHide={() => {this.setState({showInfo: false})}} />
             { this.settings() }
+            { this.export() }
+            { this.projectManager() }
         </div>
       );
     }
