@@ -1,6 +1,7 @@
 import './App.scss'
 
 import React, { Component, ChangeEvent } from 'react'
+import Container from 'react-bootstrap/Container'
 
 import Col from 'react-bootstrap/Col'
 import Row from 'react-bootstrap/Row'
@@ -95,17 +96,12 @@ class App extends Component<xTXTProps, xTXTState> {
             console.error("An error occured while initializing : ", e)
         })
 
-        var text = localStorage.getItem("xtxt-text")
-
         db.projects.mapToClass(Project)
 
-        if (text === undefined || text === null) {
-            text = "";
-        }
         this.state = {
             busy: false, 
             mode: "methods", 
-            text: text, 
+            text: "", 
             undoText: "", 
             sourceText:"", 
             exportType: "docx",
@@ -149,6 +145,13 @@ class App extends Component<xTXTProps, xTXTState> {
         this.hideProjectManager = this.hideProjectManager.bind(this)
     }
 
+    componentDidMount(): void {
+        var projectTitle = localStorage.getItem("xtxt-project-title")
+        if (projectTitle !== null) {
+            this.openProjectNamed(projectTitle)
+        }
+    }
+
     setBusy(b: boolean) {
         this.setState({busy: b})
     }
@@ -158,7 +161,6 @@ class App extends Component<xTXTProps, xTXTState> {
     }
 
     storeText(text: string) {
-        //localStorage.setItem("xtxt-text", text)
         this.getCurrentProject()!.setResults(text)
     }
 
@@ -307,7 +309,7 @@ class App extends Component<xTXTProps, xTXTState> {
     setMode(m: string) {
         this.storeSource(this.state.sourceText);
 
-        var stored = this.getStoredSourceOfProject(this.getCurrentProject()!, m) //localStorage.getItem("xtxt-modestorage-"+m)
+        var stored = this.getStoredSourceOfProject(this.getCurrentProject()!, m)
 
         if (stored === undefined || stored === null) {
             stored = ""
@@ -435,12 +437,32 @@ class App extends Component<xTXTProps, xTXTState> {
         return this.state.currentProject
     }
 
+    storeCurrentProjectTitle(title: string) {
+        localStorage.setItem("xtxt-project-title", title)
+    }
+
+    openProjectNamed(projectTitle: string) {
+        db.getProjects().then(
+            (projects) => {
+                let projectFound = projects.find((value: ProjectItem, index: number, obj: ProjectItem[]) => value.title === projectTitle)
+
+                if (projectFound !== undefined) {
+                    let project = projectFound! as Project
+                    project.setUpdater(() => {this.updateProject()})
+                    this.setState({currentProject: project, text: project.getResults(), sourceText: this.getStoredSourceOfProject(project, this.state.mode)})
+                    this.storeCurrentProjectTitle(project.getTitle())
+                }
+            }
+        )
+    }
+
     openProjectNr(projectIndex: number) {
         db.getProjects().then(
             (projects) => {
-                let project = projects[this.state.selectedProjectNr] as Project
+                let project = projects[projectIndex] as Project
                 project.setUpdater(() => {this.updateProject()})
                 this.setState({currentProject: project, text: project.getResults(), sourceText: this.getStoredSourceOfProject(project, this.state.mode)})
+                this.storeCurrentProjectTitle(project.getTitle())
             }
         )
     }
@@ -462,6 +484,7 @@ class App extends Component<xTXTProps, xTXTState> {
     onProjectNameChange(event: ChangeEvent<HTMLInputElement>) {
         if (this.getCurrentProject() !== undefined) {
             this.getCurrentProject()!.setTitle(event.target.value)
+            this.storeCurrentProjectTitle(event.target.value)
         }
     }
 
@@ -572,12 +595,12 @@ class App extends Component<xTXTProps, xTXTState> {
             </header>
             <div className="App-buttons">
                 <Row>
-                <Col xs={3}>
-                    <Button variant="outline-success" onClick={() => {this.setState({showInfo: true})}} ><i className="bi bi-info-circle"></i></Button>{' '}
-                    <Button variant="outline-danger" onClick={() => {this.setState({showSettings: true})}}><i className="bi bi-gear"></i></Button>{' '}
-                    <Button variant="outline-success" onClick={this.showProjectManager}>Manage Projects</Button>
+                <Col xs={12} md={2}>
+                    <Button variant="outline-success" title="Infos" onClick={() => {this.setState({showInfo: true})}} ><i className="bi bi-info-circle"></i></Button>{' '}
+                    <Button variant="outline-danger" title="Settings" onClick={() => {this.setState({showSettings: true})}}><i className="bi bi-gear"></i></Button>{' '}
+                    <Button variant="outline-success" title="Manage Projects" onClick={this.showProjectManager}><i className="bi bi-stack"></i></Button>
                 </Col>
-                <Col xs={6}>
+                <Col xs={12} md={7}>
                 <ButtonGroup>
                     {modes.map((radio, idx) => (
                         <ToggleButton
@@ -596,7 +619,7 @@ class App extends Component<xTXTProps, xTXTState> {
                     ))}
                 </ButtonGroup>
                 </Col>
-                <Col xs={2}>
+                <Col xs={12} md={2}>
                     <Examples disabled={this.state.examples.length === 0} examples={this.state.examples} setExample={this.setExample} />
                 </Col>
                 </Row>
@@ -655,7 +678,7 @@ class App extends Component<xTXTProps, xTXTState> {
                 </>}
                 {this.getCurrentProject() === undefined && <>
                     <p className='loadP'>please create or load a project</p>
-                    <p><Button variant="outline-success" onClick={this.showProjectManager}>Manage Projects</Button></p>
+                    <p><Button variant="outline-success" onClick={this.showProjectManager}><i className="bi bi-stack"></i> Manage Projects</Button></p>
                 </>}
             </div>
             {this.getCurrentProject() !== undefined && <>
@@ -676,7 +699,7 @@ class App extends Component<xTXTProps, xTXTState> {
                 <Button variant="outline-danger" onClick={this.stopSpeech}>stop</Button>{' '}<br />
                 </Col>
                 <Col>
-                <Button variant="outline-success" onClick={this.showExport}><i className="bi bi-box-arrow-down"></i></Button>{' '}
+                <Button variant="outline-success" title="Export" onClick={this.showExport}><i className="bi bi-box-arrow-down"></i></Button>{' '}
                 </Col>
                 </Row>
             </div>

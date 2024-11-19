@@ -63,9 +63,14 @@ export default class LargeLanguageModel extends React.Component<ILargeLanguageMo
 	}
 
     async loadModelIfCached() {
-        if (await this.modelCached()) {
-            this.loadModel()
+        try {
+            if (await this.modelCached()) {
+                this.loadModel()
+            }
         }  
+        catch {
+            console.error("error loading cached model!")
+        }
     }
 
     async componentDidMount() {
@@ -91,7 +96,7 @@ export default class LargeLanguageModel extends React.Component<ILargeLanguageMo
         this.setState( {generating: gen})
     }
 
-    async loadLLMModel() {
+    async loadLLMModel(): Promise<webllm.MLCEngineInterface | undefined> {
         const selectedModel = this.props.selectedLLMModelID
 
         const initProgressCallback = (report: webllm.InitProgressReport) => {
@@ -100,21 +105,26 @@ export default class LargeLanguageModel extends React.Component<ILargeLanguageMo
 
         console.log("loading LLM...")
 
-        const engine: webllm.MLCEngineInterface = await webllm.CreateMLCEngine(
-            selectedModel,
-            {
-                initProgressCallback: initProgressCallback,
-                logLevel: "INFO", // specify the log level
-            },
-            // customize kv cache, use either context_window_size or sliding_window_size (with attention sink)
-            {
-                context_window_size: 2048,
-                // sliding_window_size: 1024,
-                // attention_sink_size: 4,
-            },
-        )
+        try {
+            const engine: webllm.MLCEngineInterface = await webllm.CreateMLCEngine(
+                selectedModel,
+                {
+                    initProgressCallback: initProgressCallback,
+                    logLevel: "INFO", // specify the log level
+                },
+                // customize kv cache, use either context_window_size or sliding_window_size (with attention sink)
+                {
+                    context_window_size: 2048,
+                    // sliding_window_size: 1024,
+                    // attention_sink_size: 4,
+                },
+            )
 
-        return engine
+            return engine
+        }
+        catch {
+            return undefined
+        }
     }
 
     async loadModel() {
@@ -122,10 +132,12 @@ export default class LargeLanguageModel extends React.Component<ILargeLanguageMo
 
         this.loadLLMModel().then(engine => {
             console.log("engine:", engine)
-            //this.setState({ llmEngine: engine });
-            this.props.setLLMEngine(engine)
+
+            if (engine !== undefined) {
+                this.props.setLLMEngine(engine!)
+            }
             this.setLoading(false)
-            this.setStatusLabel("")
+            this.setStatusLabel("error loading model")
         });
     }
 

@@ -28,7 +28,7 @@ export class Examples extends React.Component<IExamplesProps, IExamplesState> {
     return (
       <DropdownButton disabled={this.props.disabled} id="dropdown-basic-button" title="examples" variant="outline-success">
         {this.props.examples.map((example: any, index: number) => (
-          <Dropdown.Item onClick={()=>{this.props.setExample(example.content);}}>{example.title}</Dropdown.Item>
+          <Dropdown.Item key={example.title} onClick={()=>{this.props.setExample(example.content);}}>{example.title}</Dropdown.Item>
         ))}
       </DropdownButton>
     );

@@ -72,31 +72,31 @@ export default class Methods extends React.Component<MethodsProps> {
 	}
 
 	prefix(text: string): Promise<string> {
-		const URL = WordDataBaseURL+"/prefix/"+encodeURI(text)
+		const URL = WordDataBaseURL+"/prefix/"+encodeURI(text.toLowerCase())
 
 		return this.fetchPromise(URL)
 	}
 
 	postfix(text: string): Promise<string> {
-		const URL = WordDataBaseURL+"/postfix/"+encodeURI(text)
+		const URL = WordDataBaseURL+"/postfix/"+encodeURI(text.toLowerCase())
 
 		return this.fetchPromise(URL)
 	}
 
 	containing(text: string): Promise<string> {
-		const URL = WordDataBaseURL+"/containing/"+encodeURI(text)
+		const URL = WordDataBaseURL+"/containing/"+encodeURI(text.toLowerCase())
 
 		return this.fetchPromise(URL)
 	}
 
 	letters(text: string): Promise<string> {
-		const URL = WordDataBaseURL+"/letters/"+encodeURI(text)
+		const URL = WordDataBaseURL+"/letters/"+encodeURI(text.toLowerCase())
 
 		return this.fetchPromise(URL)
 	}
 
 	vowels(text: string): Promise<string> {
-		const URL = WordDataBaseURL+"/vowels/"+encodeURI(text)
+		const URL = WordDataBaseURL+"/vowels/"+encodeURI(text.toLowerCase())
 
 		return this.fetchPromise(URL)
 	}

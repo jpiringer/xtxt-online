@@ -1,5 +1,9 @@
 # TODO
 
+automatisch ein projekt machen, wenn keines existiert?
+
+words db für spanisch und französisch optimieren
+
 project manager:
 * import
 
@@ -125,3 +129,15 @@ tiny icon
 * neues projekt
 * delete projekt
 * export
+
+das letzte projekt automatisch laden
+
+spanische und französische vokale für methods
+
+nicht case sensitiv bei words (zb. postfix Phy funktioniert nicht)
+-> online testen!
+
+
+für smartphone optimieren
+man muss zu viel scrollen
+

@@ -88,14 +88,14 @@ let superstring = {
 
 	split(txt: string) {
 		return txt.split("").join(" ")
-  },
+	},
 
 	condense(txt: string) {
     return txt.replace(/\s+/g, " ")
-  },
+	},
 		
 	stretch(txt: string) {
-		const stretchable = "aefhilmnorsuyzäöüAEFHILMNORSUYZÄÖÜ"
+		const stretchable = "ãæåāëėīïõøōūâêîôûœáàóòíìaefhilmnorsuyzäöüAEFHILMNORSUYZÃÅĀËĖÕØŌŪÂÊÎÔÛÁÀÓÒÄÖÜ"
 		var str = ""
 
 		for (var i = 0; i < txt.length; i++) {
@@ -108,12 +108,12 @@ let superstring = {
 	},
 
 	vowelsOnly(txt: string) {
-		return utils.filterString(txt, "aeiouäöüyáàóòíìAEIOUÄÖÜÁÀÓÒY ")
-  },
+		return utils.filterString(txt, "ãæåāëėīïõøōūâêîôûœaeiouäöüyáàóòíìAEIOUÃÅĀËĖÕØŌŪÂÊÎÔÛÄÖÜÁÀÓÒY ")
+	},
 
 	consOnly(txt: string) {
 		return utils.filterString(txt, "bcdfghjklmnpqrstvwxzñßBCDFGHJKLMNPQRSTVWXZÑ ")
-  },
+	},
 
 	permutate(txt: string) {
 		if (txt.length <= 0) {
