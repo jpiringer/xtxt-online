@@ -125,22 +125,22 @@ export default class Methods extends React.Component<MethodsProps> {
 				<br />
 				<Row>
 				<Col>
-				<Button variant="outline-primary" onClick={this.changer(superstring.rip)}>rip</Button>{' '}
-				<Button variant="outline-primary" onClick={this.changer(superstring.shuffle)}>shuffle</Button>{' '}
-				<Button variant="outline-primary" onClick={this.changer(superstring.sort)}>sort</Button>{' '}
-				<Button variant="outline-primary" onClick={this.changer(superstring.reverse)}>reverse</Button>{' '}
+				<Button variant="outline-primary" title="rip characters" onClick={this.changer(superstring.rip)}>rip</Button>{' '}
+				<Button variant="outline-primary" title="shuffle the characters randomly" onClick={this.changer(superstring.shuffle)}>shuffle</Button>{' '}
+				<Button variant="outline-primary" title="sort characters in alphabetic order" onClick={this.changer(superstring.sort)}>sort</Button>{' '}
+				<Button variant="outline-primary" title="reverse the sequence of the characters" onClick={this.changer(superstring.reverse)}>reverse</Button>{' '}
 
-				<Button variant="outline-primary" onClick={this.changer(superstring.noise)}>noise</Button>{' '}
-				<Button variant="outline-primary" onClick={this.changer(superstring.part)}>part</Button>{' '}
-				<Button variant="outline-primary" onClick={this.changer(superstring.split)}>split</Button>{' '}
-				<Button variant="outline-primary" onClick={this.changer(this.wordLines)}>word lines</Button>{' '}
-				<Button variant="outline-primary" onClick={this.changer(superstring.condense)}>condense</Button>{' '}
+				<Button variant="outline-primary" title="insert random interpunction characters" onClick={this.changer(superstring.noise)}>noise</Button>{' '}
+				<Button variant="outline-primary" title="insert random spaces" onClick={this.changer(superstring.part)}>part</Button>{' '}
+				<Button variant="outline-primary" title="insert a space after each character" onClick={this.changer(superstring.split)}>split</Button>{' '}
+				<Button variant="outline-primary" title="insert a linefeed after each word" onClick={this.changer(this.wordLines)}>word lines</Button>{' '}
+				<Button variant="outline-primary" title="reduce spaces" onClick={this.changer(superstring.condense)}>condense</Button>{' '}
 
-				<Button variant="outline-primary" onClick={this.changer(superstring.stretch)}>stretch</Button>{' '}
-				<Button variant="outline-primary" onClick={this.changer(superstring.vowelsOnly)}>vowels only</Button>{' '}
-				<Button variant="outline-primary" onClick={this.changer(superstring.consOnly)}>cons only</Button>{' '}
-				<Button variant="outline-primary" onClick={this.changer(superstring.duplicate)}>duplicate</Button>{' '}
-				<Button variant="outline-primary" onClick={this.changer(superstring.permutate)}>permutate</Button>{' '}
+				<Button variant="outline-primary" title="stretch characters" onClick={this.changer(superstring.stretch)}>stretch</Button>{' '}
+				<Button variant="outline-primary" title="leave only vowels" onClick={this.changer(superstring.vowelsOnly)}>vowels only</Button>{' '}
+				<Button variant="outline-primary" title="leave only consonants" onClick={this.changer(superstring.consOnly)}>cons only</Button>{' '}
+				<Button variant="outline-primary" title="duplicate the text" onClick={this.changer(superstring.duplicate)}>duplicate</Button>{' '}
+				<Button variant="outline-primary" title="show all permutations of the characters" onClick={this.changer(superstring.permutate)}>permutate</Button>{' '}
 				<DropdownButton id="dropdown-basic-button" title="words" variant="outline-primary">
 					<Dropdown.Item onClick={this.changerAsync(this.randomWord)}>random word</Dropdown.Item>
 					<Dropdown.Item onClick={this.changerAsync(this.prefix)}>words with prefix</Dropdown.Item>

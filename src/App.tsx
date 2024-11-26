@@ -678,7 +678,7 @@ class App extends Component<xTXTProps, xTXTState> {
                 </>}
                 {this.getCurrentProject() === undefined && <>
                     <p className='loadP'>please create or load a project</p>
-                    <p><Button variant="outline-success" onClick={this.showProjectManager}><i className="bi bi-stack"></i> Manage Projects</Button></p>
+                    <p><Button variant="outline-success" title="Manage Projects" onClick={this.showProjectManager}><i className="bi bi-stack"></i> Manage Projects</Button></p>
                 </>}
             </div>
             {this.getCurrentProject() !== undefined && <>

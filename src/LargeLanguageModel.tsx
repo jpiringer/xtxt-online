@@ -21,7 +21,7 @@ const examples: IExample[] = [
     {title: "poem 8", content: "write a nice poem in swedish in the style of jorge luis borges on the topic of hate and homesickness"},
     {title: "recipe", content: "write an absurd recipe"},
     {title: "weather", content: "what will the weather be like on april 1st, 2047?"},
-    {title: "joke", content: "tell me a joke please, that start with the phrase 'a microbe, the pope and darth vader walk into a bar'"},
+    {title: "joke", content: "tell me a joke please, that starts with the phrase 'a microbe, the pope and darth vader walk into a bar'"},
     {title: "word", content: "invent a new and unknown english word"}
 ]
 
